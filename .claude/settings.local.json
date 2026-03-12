@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx nest build:*)",
+      "Bash(npx jest)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite build:*)",
+      "Bash(pg_isready:*)",
+      "Bash(brew services start:*)",
+      "Bash(export PATH=\"/opt/homebrew/opt/postgresql@17/bin:$PATH\")",
+      "Bash(createdb:*)",
+      "Bash(psql:*)",
+      "Bash(timeout 15 npm run start:dev:*)",
+      "Bash(npm run seed:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(npm run start:*)",
+      "Bash(npx md-to-pdf:*)",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4MThmMzBkMC03YjY1LTQ1NzgtYjk0Mi0wMWYxYzU2MzdmNTkiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NzIyOTA0MTIsImV4cCI6MTc3MjI5NDAxMn0.uMQt0OFtz3AeDX5tzD2tWy7YniDR4q9Q7KWgTck1beQ\")",
+      "Bash(__NEW_LINE_e6bea19cc5a8d266__ echo \"\")",
+      "Bash(__NEW_LINE_e87378f60da29e74__ echo \"\")",
+      "Bash(npm run build:*)"
+    ]
+  }
+}
