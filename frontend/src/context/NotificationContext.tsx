@@ -8,6 +8,7 @@ import {
 import type { ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { API_BASE_URL } from '../api/client';
 import {
   getNotificationsApi,
   getUnreadCountApi,
@@ -66,7 +67,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     fetchNotifications();
     fetchUnreadCount();
 
-    const s = io('http://localhost:3000', {
+    const s = io(API_BASE_URL, {
       auth: { token },
     });
 

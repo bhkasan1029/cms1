@@ -37,22 +37,14 @@ function UserManagementPage() {
     }
   };
 
-  if (loading) {
-    return <p>Loading users...</p>;
-  }
+  if (loading) return <p style={{ color: 'var(--text-3)' }}>Loading users...</p>;
 
   // Reviewers can't see admin users
   const visibleUsers = isAdmin ? users : users.filter((u) => u.role !== 'admin');
 
-  const getRowClass = (u: UserRecord) => {
-    if (u.deletedAt) return 'user-row-deleted';
-    if (u.isBlocked) return 'user-row-blocked';
-    return '';
-  };
-
   return (
-    <div className="admin-panel">
-      <h2>User Management</h2>
+    <div>
+      <h2 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '1.25rem', color: 'var(--text-1)' }}>User Management</h2>
       <table className="user-table">
         <thead>
           <tr>
@@ -64,7 +56,16 @@ function UserManagementPage() {
         </thead>
         <tbody>
           {visibleUsers.map((u) => (
-            <tr key={u.id} className={getRowClass(u)}>
+            <tr
+              key={u.id}
+              className={
+                u.isBlocked
+                  ? 'user-row-blocked'
+                  : u.deletedAt
+                    ? 'user-row-deleted'
+                    : ''
+              }
+            >
               <td>
                 <span
                   className="user-name-link"
@@ -72,8 +73,16 @@ function UserManagementPage() {
                 >
                   {u.firstName} {u.lastName}
                 </span>
-                {u.isBlocked && <span className="user-status-badge user-badge-blocked">Blocked</span>}
-                {u.deletedAt && <span className="user-status-badge user-badge-deleted">Pending Deletion</span>}
+                {u.isBlocked && (
+                  <span className="user-status-badge user-badge-blocked">
+                    Blocked
+                  </span>
+                )}
+                {u.deletedAt && (
+                  <span className="user-status-badge user-badge-deleted">
+                    Pending Deletion
+                  </span>
+                )}
               </td>
               <td>{u.username}</td>
               <td>{u.email}</td>

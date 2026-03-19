@@ -5,7 +5,6 @@ import {
   FiAlertTriangle,
   FiFlag,
   FiUsers,
-  FiDownload,
   FiChevronLeft,
   FiChevronRight,
   FiArrowUp,
@@ -16,8 +15,23 @@ import {
   FiFileText,
   FiCalendar,
 } from 'react-icons/fi';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  PieChart, Pie, Cell, ResponsiveContainer, Legend,
+} from 'recharts';
 import { getTasksApi, getUsersApi } from '../api/auth';
 import type { TaskRecord, UserRecord } from '../api/auth';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type DateRange = 'today' | 'week' | 'month' | 'all';
 type SortKey = 'name' | 'role' | 'assigned' | 'completed' | 'rate';
@@ -25,6 +39,8 @@ type SortDir = 'asc' | 'desc';
 type TableSort = 'title' | 'assignee' | 'priority' | 'status' | 'created' | 'due';
 
 const PAGE_SIZE = 8;
+
+const STATUS_COLORS = ['#4ade80', '#60a5fa', '#94a3b8', '#ef4444'];
 
 function ReportPage() {
   const [tasks, setTasks] = useState<TaskRecord[]>([]);
@@ -127,7 +143,6 @@ function ReportPage() {
     }
     return days;
   }, [tasks, trendDays]);
-  const trendMax = Math.max(1, ...trendData.map((d) => Math.max(d.created, d.completed)));
 
   // ── Status Distribution ──
   const statusDist = useMemo(() => {
@@ -141,19 +156,30 @@ function ReportPage() {
 
   const statusTotal = statusDist.inProg + statusDist.pending + statusDist.completed + statusDist.overdue || 1;
 
+  const statusChartData = useMemo(() => [
+    { name: 'Completed', value: statusDist.completed },
+    { name: 'In Progress', value: statusDist.inProg },
+    { name: 'Pending', value: statusDist.pending },
+    { name: 'Overdue', value: statusDist.overdue },
+  ], [statusDist]);
+
   // ── Priority Breakdown ──
   const priorityDist = useMemo(() => ({
     low: filtered.filter((t) => t.priority === 'low').length,
     medium: filtered.filter((t) => t.priority === 'medium').length,
     urgent: filtered.filter((t) => t.priority === 'urgent').length,
   }), [filtered]);
-  const priorityMax = Math.max(1, priorityDist.low, priorityDist.medium, priorityDist.urgent);
+
+  const priorityChartData = useMemo(() => [
+    { name: 'Low', value: priorityDist.low, fill: '#4ade80' },
+    { name: 'Medium', value: priorityDist.medium, fill: '#fbbf24' },
+    { name: 'Urgent', value: priorityDist.urgent, fill: '#ef4444' },
+  ], [priorityDist]);
 
   // ── Risk Indicators ──
   const riskItems = useMemo(() => {
     const risks: { label: string; detail: string; severity: 'high' | 'medium' }[] = [];
 
-    // Overdue tasks
     const overdueTasks = filtered.filter((t) => !t.finished && new Date(t.dueDate) < now);
     if (overdueTasks.length > 0) {
       risks.push({
@@ -163,7 +189,6 @@ function ReportPage() {
       });
     }
 
-    // Bottlenecked users (>3 active tasks)
     const userLoad: Record<string, { name: string; count: number }> = {};
     filtered.filter((t) => !t.finished).forEach((t) => {
       if (!t.assignedTo) return;
@@ -179,7 +204,6 @@ function ReportPage() {
       });
     });
 
-    // High priority not started
     const urgentFrozen = filtered.filter((t) => t.priority === 'urgent' && t.status === 'frozen' && !t.finished);
     if (urgentFrozen.length > 0) {
       risks.push({
@@ -226,7 +250,13 @@ function ReportPage() {
       .sort((a, b) => b.assigned - a.assigned)
       .slice(0, 8);
   }, [userInsights]);
-  const workloadMax = Math.max(1, ...workloadData.map((u) => u.assigned));
+
+  const workloadChartData = useMemo(() =>
+    workloadData.map((u) => ({
+      name: u.name.length > 12 ? u.name.slice(0, 12) + '...' : u.name,
+      tasks: u.assigned,
+    })),
+  [workloadData]);
 
   // ── Detail Table ──
   const sortedTableTasks = useMemo(() => {
@@ -262,26 +292,6 @@ function ReportPage() {
     setTablePage(0);
   }, [tableSort]);
 
-  const handleExport = useCallback(() => {
-    const headers = ['Title', 'Assigned To', 'Priority', 'Status', 'Created', 'Due Date'];
-    const rows = sortedTableTasks.map((t) => [
-      t.title,
-      t.assignedTo ? `${t.assignedTo.firstName} ${t.assignedTo.lastName}` : '',
-      t.priority,
-      t.finished ? 'completed' : t.status,
-      new Date(t.createdAt).toLocaleDateString(),
-      new Date(t.dueDate).toLocaleDateString(),
-    ]);
-    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `report-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [sortedTableTasks]);
-
   function getInitials(first: string, last: string) {
     return `${first?.[0] || ''}${last?.[0] || ''}`.toUpperCase();
   }
@@ -289,19 +299,40 @@ function ReportPage() {
   const SortIcon = ({ active, dir }: { active: boolean; dir: SortDir }) =>
     active ? (dir === 'asc' ? <FiArrowUp size={11} /> : <FiArrowDown size={11} />) : null;
 
+  const priorityVariant = (p: string) => {
+    if (p === 'urgent') return 'destructive' as const;
+    if (p === 'medium') return 'default' as const;
+    return 'secondary' as const;
+  };
+
+  const statusLabel = (t: TaskRecord) =>
+    t.finished ? 'Completed' : t.status === 'in_progress' ? 'In Progress' : 'Frozen';
+
+  // ── Loading skeleton ──
   if (loading) {
     return (
-      <div className="rp-page">
-        <div className="rp-title-section">
-          <h2 className="rp-title">Reports & Analytics</h2>
-          <p className="rp-subtitle">Loading data...</p>
+      <div className="flex flex-col gap-6 p-2">
+        <div>
+          <Skeleton className="h-7 w-56 mb-2" />
+          <Skeleton className="h-4 w-80" />
         </div>
-        <div className="db-hero">
+        <div className="grid grid-cols-5 gap-4">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="db-hero-card db-hero-skeleton">
-              <div className="td-skeleton-line td-skeleton-title" />
-              <div className="td-skeleton-line" style={{ width: '40%' }} />
-            </div>
+            <Card key={i}>
+              <CardContent className="p-5">
+                <Skeleton className="h-4 w-24 mb-3" />
+                <Skeleton className="h-8 w-16" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-5">
+                <Skeleton className="h-40 w-full" />
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
@@ -309,423 +340,524 @@ function ReportPage() {
   }
 
   return (
-    <div className="rp-page">
+    <div className="flex flex-col gap-6 p-2">
       {/* ── Title ── */}
-      <div className="rp-title-section">
-        <h2 className="rp-title">Reports & Analytics</h2>
-        <p className="rp-subtitle">Insights into task performance, team workload, and productivity.</p>
+      <div>
+        <h2 className="text-xl font-bold" style={{ color: 'var(--text-1)' }}>Reports & Analytics</h2>
+        <p className="text-sm" style={{ color: 'var(--text-3)' }}>
+          Insights into task performance, team workload, and productivity.
+        </p>
       </div>
 
       {/* ── Filter Bar ── */}
-      <div className="rp-filter-bar">
-        <div className="rp-filter-group">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-1">
           {(['today', 'week', 'month', 'all'] as DateRange[]).map((r) => (
-            <button
+            <Button
               key={r}
-              className={`rp-range-btn ${dateRange === r ? 'rp-range-active' : ''}`}
+              variant={dateRange === r ? 'default' : 'outline'}
+              size="sm"
               onClick={() => { setDateRange(r); setTablePage(0); }}
             >
               {r === 'all' ? 'All Time' : r.charAt(0).toUpperCase() + r.slice(1)}
-            </button>
+            </Button>
           ))}
         </div>
-        <div className="rp-filter-group">
-          <select className="rp-filter-select" value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value); setTablePage(0); }}>
-            <option value="all">All Status</option>
-            <option value="in_progress">In Progress</option>
-            <option value="frozen">Pending</option>
-            <option value="completed">Completed</option>
-            <option value="overdue">Overdue</option>
-          </select>
-          <select className="rp-filter-select" value={filterPriority} onChange={(e) => { setFilterPriority(e.target.value); setTablePage(0); }}>
-            <option value="all">All Priority</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="urgent">Urgent</option>
-          </select>
-          <select className="rp-filter-select" value={filterUser} onChange={(e) => { setFilterUser(e.target.value); setTablePage(0); }}>
-            <option value="all">All Users</option>
-            {users.filter((u) => !u.deletedAt).map((u) => (
-              <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
-            ))}
-          </select>
+        <div className="flex items-center gap-2">
+          <Select value={filterStatus} onValueChange={(v) => { setFilterStatus(v); setTablePage(0); }}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="frozen">Pending</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="overdue">Overdue</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filterPriority} onValueChange={(v) => { setFilterPriority(v); setTablePage(0); }}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="All Priority" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Priority</SelectItem>
+              <SelectItem value="low">Low</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="urgent">Urgent</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filterUser} onValueChange={(v) => { setFilterUser(v); setTablePage(0); }}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="All Users" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Users</SelectItem>
+              {users.filter((u) => !u.deletedAt).map((u) => (
+                <SelectItem key={u.id} value={u.id}>{u.firstName} {u.lastName}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <button className="rp-export-btn" onClick={handleExport}>
-          <FiDownload size={14} /> Export CSV
-        </button>
       </div>
 
       {/* ── Key Metrics ── */}
-      <div className="db-hero">
-        <div className="db-hero-card db-hero-tint-green">
-          <div className="db-hero-icon db-icon-green"><FiTrendingUp /></div>
-          <div className="db-hero-info">
-            <span className="db-hero-number">{completionRate}%</span>
-            <span className="db-hero-label">Completion Rate</span>
-          </div>
-          <span className="rp-micro">{completedCount} of {totalFiltered} tasks</span>
-        </div>
-        <div className="db-hero-card db-hero-tint-blue">
-          <div className="db-hero-icon db-icon-blue"><FiClock /></div>
-          <div className="db-hero-info">
-            <span className="db-hero-number">{avgCompletionDays}d</span>
-            <span className="db-hero-label">Avg Completion Time</span>
-          </div>
-          <span className="rp-micro">Per task average</span>
-        </div>
-        <div className="db-hero-card db-hero-tint-red">
-          <div className="db-hero-icon db-icon-red"><FiAlertTriangle /></div>
-          <div className="db-hero-info">
-            <span className="db-hero-number">{overdueRatio}%</span>
-            <span className="db-hero-label">Overdue Ratio</span>
-          </div>
-          <span className="rp-micro">{overdueCount} task{overdueCount !== 1 ? 's' : ''} overdue</span>
-        </div>
-        <div className="db-hero-card db-hero-tint-amber">
-          <div className="db-hero-icon db-icon-amber"><FiFlag /></div>
-          <div className="db-hero-info">
-            <span className="db-hero-number">{highPriorityCount}</span>
-            <span className="db-hero-label">High Priority</span>
-          </div>
-          <span className="rp-micro">Urgent tasks</span>
-        </div>
-        <div className="db-hero-card db-hero-tint-purple">
-          <div className="db-hero-icon db-icon-purple"><FiUsers /></div>
-          <div className="db-hero-info">
-            <span className="db-hero-number">{activeContributors}</span>
-            <span className="db-hero-label">Active Contributors</span>
-          </div>
-          <span className="rp-micro">With assigned tasks</span>
-        </div>
+      <div className="grid grid-cols-5 gap-4">
+        <Card style={{ background: 'var(--tint-green)' }}>
+          <CardContent className="p-5 flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(74,222,128,0.15)', color: '#4ade80' }}>
+              <FiTrendingUp size={18} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold" style={{ color: 'var(--text-1)' }}>{completionRate}%</span>
+              <span className="text-xs" style={{ color: 'var(--text-3)' }}>Completion Rate</span>
+            </div>
+            <span className="ml-auto text-[0.7rem]" style={{ color: 'var(--text-5)' }}>{completedCount} of {totalFiltered} tasks</span>
+          </CardContent>
+        </Card>
+        <Card style={{ background: 'var(--tint-blue)' }}>
+          <CardContent className="p-5 flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(96,165,250,0.15)', color: '#60a5fa' }}>
+              <FiClock size={18} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold" style={{ color: 'var(--text-1)' }}>{avgCompletionDays}d</span>
+              <span className="text-xs" style={{ color: 'var(--text-3)' }}>Avg Completion Time</span>
+            </div>
+            <span className="ml-auto text-[0.7rem]" style={{ color: 'var(--text-5)' }}>Per task average</span>
+          </CardContent>
+        </Card>
+        <Card style={{ background: 'var(--tint-red)' }}>
+          <CardContent className="p-5 flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
+              <FiAlertTriangle size={18} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold" style={{ color: 'var(--text-1)' }}>{overdueRatio}%</span>
+              <span className="text-xs" style={{ color: 'var(--text-3)' }}>Overdue Ratio</span>
+            </div>
+            <span className="ml-auto text-[0.7rem]" style={{ color: 'var(--text-5)' }}>{overdueCount} task{overdueCount !== 1 ? 's' : ''} overdue</span>
+          </CardContent>
+        </Card>
+        <Card style={{ background: 'var(--tint-amber)' }}>
+          <CardContent className="p-5 flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24' }}>
+              <FiFlag size={18} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold" style={{ color: 'var(--text-1)' }}>{highPriorityCount}</span>
+              <span className="text-xs" style={{ color: 'var(--text-3)' }}>High Priority</span>
+            </div>
+            <span className="ml-auto text-[0.7rem]" style={{ color: 'var(--text-5)' }}>Urgent tasks</span>
+          </CardContent>
+        </Card>
+        <Card style={{ background: 'var(--tint-purple)' }}>
+          <CardContent className="p-5 flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(167,139,250,0.15)', color: '#a78bfa' }}>
+              <FiUsers size={18} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold" style={{ color: 'var(--text-1)' }}>{activeContributors}</span>
+              <span className="text-xs" style={{ color: 'var(--text-3)' }}>Active Contributors</span>
+            </div>
+            <span className="ml-auto text-[0.7rem]" style={{ color: 'var(--text-5)' }}>With assigned tasks</span>
+          </CardContent>
+        </Card>
       </div>
 
       {/* ── Primary Analytics ── */}
-      <div className="db-main-grid">
-        <div className="db-left-col">
+      <div className="grid grid-cols-[3fr_2fr] gap-4">
+        {/* Left column */}
+        <div className="flex flex-col gap-4">
           {/* Task Performance Trends */}
-          <div className="db-panel">
-            <div className="db-panel-header">
-              <h3 className="db-panel-title"><FiActivity className="db-panel-title-icon" /> Task Performance Trends</h3>
-              <span className="db-chart-range">Last {trendDays} day{trendDays > 1 ? 's' : ''}</span>
-            </div>
-            <div className="db-chart">
-              <div className="db-chart-legend">
-                <span className="db-legend-item"><span className="db-legend-dot db-legend-created" /> Created</span>
-                <span className="db-legend-item"><span className="db-legend-dot db-legend-completed" /> Completed</span>
-              </div>
-              <div className="rp-line-chart">
-                {/* Y-axis labels */}
-                <div className="rp-line-y-axis">
-                  <span>{trendMax}</span>
-                  <span>{Math.round(trendMax / 2)}</span>
-                  <span>0</span>
-                </div>
-                <div className="rp-line-area">
-                  {/* Grid lines */}
-                  <div className="rp-line-grid">
-                    <div className="rp-grid-line" />
-                    <div className="rp-grid-line" />
-                    <div className="rp-grid-line" />
-                  </div>
-                  {/* Bars */}
-                  <div className="db-chart-bars">
-                    {trendData.map((d, i) => (
-                      <div key={i} className="db-chart-col">
-                        <div className="db-chart-bar-group">
-                          <div className="db-chart-bar db-bar-created" style={{ height: `${(d.created / trendMax) * 100}%` }} title={`Created: ${d.created}`} />
-                          <div className="db-chart-bar db-bar-completed" style={{ height: `${(d.completed / trendMax) * 100}%` }} title={`Completed: ${d.completed}`} />
-                        </div>
-                        <span className="db-chart-label">{d.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <FiActivity size={15} style={{ color: 'var(--text-3)' }} /> Task Performance Trends
+              </CardTitle>
+              <span className="text-xs" style={{ color: 'var(--text-4)' }}>Last {trendDays} day{trendDays > 1 ? 's' : ''}</span>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={trendData} barGap={2}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--n4)" />
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'var(--text-4)' }} />
+                  <YAxis tick={{ fontSize: 11, fill: 'var(--text-4)' }} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--n5)',
+                      borderRadius: 8,
+                      fontSize: 12,
+                      color: 'var(--text-1)',
+                    }}
+                  />
+                  <Legend
+                    iconType="circle"
+                    iconSize={8}
+                    wrapperStyle={{ fontSize: 12, color: 'var(--text-3)' }}
+                  />
+                  <Bar dataKey="created" name="Created" fill="#60a5fa" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="completed" name="Completed" fill="#4ade80" radius={[3, 3, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
 
           {/* Status Distribution */}
-          <div className="db-panel">
-            <div className="db-panel-header">
-              <h3 className="db-panel-title"><FiPieChart className="db-panel-title-icon" /> Status Distribution</h3>
-            </div>
-            <div className="rp-status-dist">
-              <div className="rp-donut-wrap">
-                <svg viewBox="0 0 36 36" className="rp-donut">
-                  {(() => {
-                    const segments = [
-                      { value: statusDist.completed, color: '#4ade80' },
-                      { value: statusDist.inProg, color: '#60a5fa' },
-                      { value: statusDist.pending, color: '#94a3b8' },
-                      { value: statusDist.overdue, color: '#ef4444' },
-                    ];
-                    let offset = 0;
-                    return segments.map((s, i) => {
-                      const pct = (s.value / statusTotal) * 100;
-                      const el = (
-                        <circle
-                          key={i}
-                          cx="18" cy="18" r="15.9155"
-                          fill="none"
-                          stroke={s.color}
-                          strokeWidth="3"
-                          strokeDasharray={`${pct} ${100 - pct}`}
-                          strokeDashoffset={`${-offset}`}
-                          strokeLinecap="round"
-                        />
-                      );
-                      offset += pct;
-                      return el;
-                    });
-                  })()}
-                </svg>
-                <div className="rp-donut-center">
-                  <span className="rp-donut-number">{totalFiltered}</span>
-                  <span className="rp-donut-label">Total</span>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <FiPieChart size={15} style={{ color: 'var(--text-3)' }} /> Status Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-8">
+                <ResponsiveContainer width={180} height={180}>
+                  <PieChart>
+                    <Pie
+                      data={statusChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={80}
+                      paddingAngle={2}
+                      dataKey="value"
+                      strokeWidth={0}
+                    >
+                      {statusChartData.map((_, idx) => (
+                        <Cell key={idx} fill={STATUS_COLORS[idx]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--n5)',
+                        borderRadius: 8,
+                        fontSize: 12,
+                        color: 'var(--text-1)',
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="flex flex-col gap-3">
+                  {[
+                    { label: 'Completed', value: statusDist.completed, color: '#4ade80' },
+                    { label: 'In Progress', value: statusDist.inProg, color: '#60a5fa' },
+                    { label: 'Pending', value: statusDist.pending, color: '#94a3b8' },
+                    { label: 'Overdue', value: statusDist.overdue, color: '#ef4444' },
+                  ].map((s) => (
+                    <div key={s.label} className="flex items-center gap-2 text-sm">
+                      <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: s.color }} />
+                      <span style={{ color: 'var(--text-2)' }}>{s.label}</span>
+                      <span className="font-semibold ml-auto" style={{ color: 'var(--text-1)' }}>{s.value}</span>
+                      <span className="text-xs w-10 text-right" style={{ color: 'var(--text-4)' }}>
+                        {totalFiltered > 0 ? Math.round((s.value / statusTotal) * 100) : 0}%
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="rp-status-legend">
-                <div className="rp-status-leg-item">
-                  <span className="rp-leg-dot" style={{ background: '#4ade80' }} />
-                  <span className="rp-leg-label">Completed</span>
-                  <span className="rp-leg-value">{statusDist.completed}</span>
-                  <span className="rp-leg-pct">{totalFiltered > 0 ? Math.round((statusDist.completed / statusTotal) * 100) : 0}%</span>
-                </div>
-                <div className="rp-status-leg-item">
-                  <span className="rp-leg-dot" style={{ background: '#60a5fa' }} />
-                  <span className="rp-leg-label">In Progress</span>
-                  <span className="rp-leg-value">{statusDist.inProg}</span>
-                  <span className="rp-leg-pct">{totalFiltered > 0 ? Math.round((statusDist.inProg / statusTotal) * 100) : 0}%</span>
-                </div>
-                <div className="rp-status-leg-item">
-                  <span className="rp-leg-dot" style={{ background: '#94a3b8' }} />
-                  <span className="rp-leg-label">Pending</span>
-                  <span className="rp-leg-value">{statusDist.pending}</span>
-                  <span className="rp-leg-pct">{totalFiltered > 0 ? Math.round((statusDist.pending / statusTotal) * 100) : 0}%</span>
-                </div>
-                <div className="rp-status-leg-item">
-                  <span className="rp-leg-dot" style={{ background: '#ef4444' }} />
-                  <span className="rp-leg-label">Overdue</span>
-                  <span className="rp-leg-value">{statusDist.overdue}</span>
-                  <span className="rp-leg-pct">{totalFiltered > 0 ? Math.round((statusDist.overdue / statusTotal) * 100) : 0}%</span>
-                </div>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="db-right-col">
+        {/* Right column */}
+        <div className="flex flex-col gap-4">
           {/* Priority Breakdown */}
-          <div className="db-panel">
-            <div className="db-panel-header">
-              <h3 className="db-panel-title"><FiBarChart2 className="db-panel-title-icon" /> Priority Breakdown</h3>
-            </div>
-            <div className="rp-priority-chart">
-              {([
-                { key: 'low' as const, label: 'Low', color: '#4ade80', bg: 'rgba(74,222,128,0.15)' },
-                { key: 'medium' as const, label: 'Medium', color: '#fbbf24', bg: 'rgba(251,191,36,0.15)' },
-                { key: 'urgent' as const, label: 'Urgent', color: '#ef4444', bg: 'rgba(239,68,68,0.15)' },
-              ]).map((p) => (
-                <div key={p.key} className="rp-prio-row">
-                  <div className="rp-prio-label-row">
-                    <span className="rp-prio-label">{p.label}</span>
-                    <span className="rp-prio-count" style={{ color: p.color }}>{priorityDist[p.key]}</span>
-                  </div>
-                  <div className="rp-prio-bar-bg">
-                    <div className="rp-prio-bar-fill" style={{ width: `${(priorityDist[p.key] / priorityMax) * 100}%`, background: p.color }} />
-                  </div>
-                  <span className="rp-prio-pct">{totalFiltered > 0 ? Math.round((priorityDist[p.key] / totalFiltered) * 100) : 0}%</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <FiBarChart2 size={15} style={{ color: 'var(--text-3)' }} /> Priority Breakdown
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={priorityChartData} layout="vertical" barSize={16}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--n4)" horizontal={false} />
+                  <XAxis type="number" tick={{ fontSize: 11, fill: 'var(--text-4)' }} allowDecimals={false} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 12, fill: 'var(--text-2)' }} width={60} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--n5)',
+                      borderRadius: 8,
+                      fontSize: 12,
+                      color: 'var(--text-1)',
+                    }}
+                  />
+                  <Bar dataKey="value" name="Tasks" radius={[0, 4, 4, 0]}>
+                    {priorityChartData.map((entry, idx) => (
+                      <Cell key={idx} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="flex justify-between mt-2 px-1">
+                {(['low', 'medium', 'urgent'] as const).map((p) => (
+                  <span key={p} className="text-xs" style={{ color: 'var(--text-4)' }}>
+                    {p.charAt(0).toUpperCase() + p.slice(1)}: {totalFiltered > 0 ? Math.round((priorityDist[p] / totalFiltered) * 100) : 0}%
+                  </span>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Risk Indicators */}
-          <div className="db-panel">
-            <div className="db-panel-header">
-              <h3 className="db-panel-title"><FiAlertTriangle className="db-panel-title-icon" /> Risk Indicators</h3>
-            </div>
-            <div className="rp-risks">
-              {riskItems.length === 0 ? (
-                <div className="db-task-empty">No risks detected</div>
-              ) : riskItems.map((r, i) => (
-                <div key={i} className={`rp-risk-item rp-risk-${r.severity}`}>
-                  <FiAlertTriangle className="rp-risk-icon" />
-                  <div className="rp-risk-content">
-                    <span className="rp-risk-label">{r.label}</span>
-                    <span className="rp-risk-detail">{r.detail}</span>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <FiAlertTriangle size={15} style={{ color: 'var(--text-3)' }} /> Risk Indicators
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-2">
+                {riskItems.length === 0 ? (
+                  <p className="text-sm py-4 text-center" style={{ color: 'var(--text-4)' }}>No risks detected</p>
+                ) : riskItems.map((r, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-2.5 rounded-lg px-3 py-2.5"
+                    style={{
+                      background: r.severity === 'high' ? 'rgba(239,68,68,0.08)' : 'rgba(251,191,36,0.08)',
+                      border: `1px solid ${r.severity === 'high' ? 'rgba(239,68,68,0.15)' : 'rgba(251,191,36,0.15)'}`,
+                    }}
+                  >
+                    <FiAlertTriangle
+                      size={14}
+                      className="mt-0.5 shrink-0"
+                      style={{ color: r.severity === 'high' ? '#ef4444' : '#fbbf24' }}
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-[0.82rem] font-medium" style={{ color: 'var(--text-1)' }}>{r.label}</span>
+                      <span className="text-[0.72rem]" style={{ color: 'var(--text-3)' }}>{r.detail}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* ── Secondary Analytics ── */}
-      <div className="rp-secondary-grid">
+      <div className="grid grid-cols-[3fr_2fr] gap-4">
         {/* User Insights Table */}
-        <div className="db-panel rp-insights-panel">
-          <div className="db-panel-header">
-            <h3 className="db-panel-title"><FiUsers className="db-panel-title-icon" /> User & Team Insights</h3>
-          </div>
-          <div className="rp-table-wrap">
-            <table className="rp-table">
-              <thead>
-                <tr>
-                  <th onClick={() => toggleInsightSort('name')} className="rp-th-sortable">
-                    User <SortIcon active={insightSort === 'name'} dir={insightDir} />
-                  </th>
-                  <th onClick={() => toggleInsightSort('role')} className="rp-th-sortable">
-                    Role <SortIcon active={insightSort === 'role'} dir={insightDir} />
-                  </th>
-                  <th onClick={() => toggleInsightSort('assigned')} className="rp-th-sortable">
-                    Assigned <SortIcon active={insightSort === 'assigned'} dir={insightDir} />
-                  </th>
-                  <th onClick={() => toggleInsightSort('completed')} className="rp-th-sortable">
-                    Completed <SortIcon active={insightSort === 'completed'} dir={insightDir} />
-                  </th>
-                  <th onClick={() => toggleInsightSort('rate')} className="rp-th-sortable">
-                    Rate <SortIcon active={insightSort === 'rate'} dir={insightDir} />
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {userInsights.map((u) => (
-                  <tr key={u.id}>
-                    <td>
-                      <div className="rp-user-cell">
-                        <div className="db-task-row-avatar">{u.name.split(' ').map((n) => n[0]).join('').toUpperCase()}</div>
-                        <span>{u.name}</span>
-                      </div>
-                    </td>
-                    <td><span className="rp-role-badge">{u.role}</span></td>
-                    <td>{u.assigned}</td>
-                    <td>{u.completed}</td>
-                    <td>
-                      <div className="rp-rate-cell">
-                        <div className="rp-rate-bar-bg">
-                          <div className="rp-rate-bar-fill" style={{ width: `${u.rate}%` }} />
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <FiUsers size={15} style={{ color: 'var(--text-3)' }} /> User & Team Insights
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="max-h-[320px] overflow-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="cursor-pointer select-none" onClick={() => toggleInsightSort('name')}>
+                      <span className="inline-flex items-center gap-1">User <SortIcon active={insightSort === 'name'} dir={insightDir} /></span>
+                    </TableHead>
+                    <TableHead className="cursor-pointer select-none" onClick={() => toggleInsightSort('role')}>
+                      <span className="inline-flex items-center gap-1">Role <SortIcon active={insightSort === 'role'} dir={insightDir} /></span>
+                    </TableHead>
+                    <TableHead className="cursor-pointer select-none" onClick={() => toggleInsightSort('assigned')}>
+                      <span className="inline-flex items-center gap-1">Assigned <SortIcon active={insightSort === 'assigned'} dir={insightDir} /></span>
+                    </TableHead>
+                    <TableHead className="cursor-pointer select-none" onClick={() => toggleInsightSort('completed')}>
+                      <span className="inline-flex items-center gap-1">Completed <SortIcon active={insightSort === 'completed'} dir={insightDir} /></span>
+                    </TableHead>
+                    <TableHead className="cursor-pointer select-none" onClick={() => toggleInsightSort('rate')}>
+                      <span className="inline-flex items-center gap-1">Rate <SortIcon active={insightSort === 'rate'} dir={insightDir} /></span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {userInsights.map((u) => (
+                    <TableRow key={u.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-[26px] w-[26px] items-center justify-center rounded-full text-[0.62rem] font-semibold shrink-0" style={{ background: 'rgba(167,139,250,0.15)', color: '#a78bfa' }}>{u.name.split(' ').map((n) => n[0]).join('').toUpperCase()}</div>
+                          <span>{u.name}</span>
                         </div>
-                        <span className="rp-rate-val">{u.rate}%</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="capitalize text-[0.7rem]">{u.role}</Badge>
+                      </TableCell>
+                      <TableCell>{u.assigned}</TableCell>
+                      <TableCell>{u.completed}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <div className="h-1.5 w-16 rounded-full" style={{ background: 'var(--n3)' }}>
+                            <div className="h-full rounded-full" style={{ width: `${u.rate}%`, background: '#4ade80' }} />
+                          </div>
+                          <span className="text-xs" style={{ color: 'var(--text-3)' }}>{u.rate}%</span>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Workload Distribution */}
-        <div className="db-panel">
-          <div className="db-panel-header">
-            <h3 className="db-panel-title"><FiBarChart2 className="db-panel-title-icon" /> Workload Distribution</h3>
-          </div>
-          <div className="rp-workload">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <FiBarChart2 size={15} style={{ color: 'var(--text-3)' }} /> Workload Distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
             {workloadData.length === 0 ? (
-              <div className="db-task-empty">No workload data</div>
-            ) : workloadData.map((u) => (
-              <div key={u.id} className="rp-workload-row">
-                <span className="rp-workload-name">{u.name}</span>
-                <div className="rp-workload-bar-bg">
-                  <div
-                    className="rp-workload-bar-fill"
-                    style={{ width: `${(u.assigned / workloadMax) * 100}%` }}
+              <p className="text-sm py-4 text-center" style={{ color: 'var(--text-4)' }}>No workload data</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={workloadChartData} layout="vertical" barSize={14}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--n4)" horizontal={false} />
+                  <XAxis type="number" tick={{ fontSize: 11, fill: 'var(--text-4)' }} allowDecimals={false} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-2)' }} width={90} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--n5)',
+                      borderRadius: 8,
+                      fontSize: 12,
+                      color: 'var(--text-1)',
+                    }}
                   />
-                </div>
-                <span className="rp-workload-count">{u.assigned}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+                  <Bar dataKey="tasks" name="Assigned Tasks" fill="#818cf8" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* ── Detailed Reports Table ── */}
-      <div className="db-panel rp-detail-panel">
-        <div className="db-panel-header">
-          <h3 className="db-panel-title"><FiFileText className="db-panel-title-icon" /> Detailed Task Report</h3>
-          <span className="rp-micro">{sortedTableTasks.length} task{sortedTableTasks.length !== 1 ? 's' : ''}</span>
-        </div>
-        <div className="rp-detail-table-wrap">
-          <table className="rp-detail-table">
-            <thead>
-              <tr>
-                <th onClick={() => toggleTableSort('title')} className="rp-th-sortable">Title <SortIcon active={tableSort === 'title'} dir={tableDir} /></th>
-                <th onClick={() => toggleTableSort('assignee')} className="rp-th-sortable">Assigned To <SortIcon active={tableSort === 'assignee'} dir={tableDir} /></th>
-                <th onClick={() => toggleTableSort('priority')} className="rp-th-sortable">Priority <SortIcon active={tableSort === 'priority'} dir={tableDir} /></th>
-                <th onClick={() => toggleTableSort('status')} className="rp-th-sortable">Status <SortIcon active={tableSort === 'status'} dir={tableDir} /></th>
-                <th onClick={() => toggleTableSort('created')} className="rp-th-sortable">Created <SortIcon active={tableSort === 'created'} dir={tableDir} /></th>
-                <th onClick={() => toggleTableSort('due')} className="rp-th-sortable">Due Date <SortIcon active={tableSort === 'due'} dir={tableDir} /></th>
-              </tr>
-            </thead>
-            <tbody>
-              {pagedTasks.map((t) => (
-                <tr key={t.id}>
-                  <td className="rp-detail-title">{t.title}</td>
-                  <td>
-                    {t.assignedTo ? (
-                      <div className="rp-user-cell">
-                        <div className="db-task-row-avatar">{getInitials(t.assignedTo.firstName, t.assignedTo.lastName)}</div>
-                        <span>{t.assignedTo.firstName} {t.assignedTo.lastName}</span>
-                      </div>
-                    ) : '—'}
-                  </td>
-                  <td>
-                    <span className={`db-task-row-priority db-priority-${t.priority}`}>
-                      {t.priority === 'urgent' ? 'Urgent' : t.priority === 'medium' ? 'Medium' : 'Low'}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`db-task-row-status ${t.finished ? 'db-status-completed' : t.status === 'in_progress' ? 'db-status-progress' : 'db-status-frozen'}`}>
-                      {t.finished ? 'Completed' : t.status === 'in_progress' ? 'In Progress' : 'Frozen'}
-                    </span>
-                  </td>
-                  <td className="rp-date-cell">{new Date(t.createdAt).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                  <td className={`rp-date-cell ${!t.finished && new Date(t.dueDate) < now ? 'rp-overdue-text' : ''}`}>
-                    {new Date(t.dueDate).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {totalPages > 1 && (
-          <div className="rp-pagination">
-            <button className="rp-page-btn" disabled={tablePage === 0} onClick={() => setTablePage((p) => p - 1)}>
-              <FiChevronLeft size={14} />
-            </button>
-            <span className="rp-page-info">Page {tablePage + 1} of {totalPages}</span>
-            <button className="rp-page-btn" disabled={tablePage >= totalPages - 1} onClick={() => setTablePage((p) => p + 1)}>
-              <FiChevronRight size={14} />
-            </button>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+            <FiFileText size={15} style={{ color: 'var(--text-3)' }} /> Detailed Task Report
+          </CardTitle>
+          <span className="text-xs" style={{ color: 'var(--text-5)' }}>{sortedTableTasks.length} task{sortedTableTasks.length !== 1 ? 's' : ''}</span>
+        </CardHeader>
+        <CardContent>
+          <div className="max-h-[420px] overflow-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="cursor-pointer select-none" onClick={() => toggleTableSort('title')}>
+                    <span className="inline-flex items-center gap-1">Title <SortIcon active={tableSort === 'title'} dir={tableDir} /></span>
+                  </TableHead>
+                  <TableHead className="cursor-pointer select-none" onClick={() => toggleTableSort('assignee')}>
+                    <span className="inline-flex items-center gap-1">Assigned To <SortIcon active={tableSort === 'assignee'} dir={tableDir} /></span>
+                  </TableHead>
+                  <TableHead className="cursor-pointer select-none" onClick={() => toggleTableSort('priority')}>
+                    <span className="inline-flex items-center gap-1">Priority <SortIcon active={tableSort === 'priority'} dir={tableDir} /></span>
+                  </TableHead>
+                  <TableHead className="cursor-pointer select-none" onClick={() => toggleTableSort('status')}>
+                    <span className="inline-flex items-center gap-1">Status <SortIcon active={tableSort === 'status'} dir={tableDir} /></span>
+                  </TableHead>
+                  <TableHead className="cursor-pointer select-none" onClick={() => toggleTableSort('created')}>
+                    <span className="inline-flex items-center gap-1">Created <SortIcon active={tableSort === 'created'} dir={tableDir} /></span>
+                  </TableHead>
+                  <TableHead className="cursor-pointer select-none" onClick={() => toggleTableSort('due')}>
+                    <span className="inline-flex items-center gap-1">Due Date <SortIcon active={tableSort === 'due'} dir={tableDir} /></span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pagedTasks.map((t) => (
+                  <TableRow key={t.id}>
+                    <TableCell className="max-w-[220px] truncate font-medium">{t.title}</TableCell>
+                    <TableCell>
+                      {t.assignedTo ? (
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-[26px] w-[26px] items-center justify-center rounded-full text-[0.62rem] font-semibold shrink-0" style={{ background: 'rgba(167,139,250,0.15)', color: '#a78bfa' }}>{getInitials(t.assignedTo.firstName, t.assignedTo.lastName)}</div>
+                          <span>{t.assignedTo.firstName} {t.assignedTo.lastName}</span>
+                        </div>
+                      ) : '—'}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={priorityVariant(t.priority)}
+                        className="text-xs"
+                        style={t.priority === 'medium' ? { background: '#fbbf24', color: '#1f2937' } : undefined}
+                      >
+                        {t.priority === 'urgent' ? 'Urgent' : t.priority === 'medium' ? 'Medium' : 'Low'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        style={{
+                          borderColor: t.finished ? '#4ade80' : t.status === 'in_progress' ? '#60a5fa' : '#94a3b8',
+                          color: t.finished ? '#4ade80' : t.status === 'in_progress' ? '#60a5fa' : '#94a3b8',
+                        }}
+                      >
+                        {statusLabel(t)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs whitespace-nowrap" style={{ color: 'var(--text-4)' }}>
+                      {new Date(t.createdAt).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </TableCell>
+                    <TableCell
+                      className="text-xs whitespace-nowrap"
+                      style={{ color: !t.finished && new Date(t.dueDate) < now ? '#ef4444' : 'var(--text-4)' }}
+                    >
+                      {new Date(t.dueDate).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
-        )}
-      </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 pt-4">
+              <Button variant="outline" size="icon" disabled={tablePage === 0} onClick={() => setTablePage((p) => p - 1)}>
+                <FiChevronLeft size={14} />
+              </Button>
+              <span className="text-xs" style={{ color: 'var(--text-3)' }}>Page {tablePage + 1} of {totalPages}</span>
+              <Button variant="outline" size="icon" disabled={tablePage >= totalPages - 1} onClick={() => setTablePage((p) => p + 1)}>
+                <FiChevronRight size={14} />
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* ── Report Preview Cards ── */}
-      <div className="rp-report-previews">
-        <div className="rp-preview-card">
-          <div className="rp-preview-icon db-icon-blue"><FiCalendar /></div>
-          <div className="rp-preview-info">
-            <span className="rp-preview-title">Weekly Summary</span>
-            <span className="rp-preview-stat">{tasks.filter((t) => new Date(t.createdAt) >= new Date(now.getTime() - 7 * 86400000)).length} tasks this week</span>
+      <div className="grid grid-cols-3 gap-4">
+        <Card className="flex items-center gap-4 p-4 transition-transform hover:-translate-y-0.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(96,165,250,0.15)', color: '#60a5fa' }}>
+            <FiCalendar size={18} />
           </div>
-        </div>
-        <div className="rp-preview-card">
-          <div className="rp-preview-icon db-icon-green"><FiTrendingUp /></div>
-          <div className="rp-preview-info">
-            <span className="rp-preview-title">Monthly Productivity</span>
-            <span className="rp-preview-stat">{completionRate}% completion rate</span>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium" style={{ color: 'var(--text-1)' }}>Weekly Summary</span>
+            <span className="text-xs" style={{ color: 'var(--text-3)' }}>
+              {tasks.filter((t) => new Date(t.createdAt) >= new Date(now.getTime() - 7 * 86400000)).length} tasks this week
+            </span>
           </div>
-        </div>
-        <div className="rp-preview-card">
-          <div className="rp-preview-icon db-icon-purple"><FiUsers /></div>
-          <div className="rp-preview-info">
-            <span className="rp-preview-title">User Performance</span>
-            <span className="rp-preview-stat">{activeContributors} active contributor{activeContributors !== 1 ? 's' : ''}</span>
+        </Card>
+        <Card className="flex items-center gap-4 p-4 transition-transform hover:-translate-y-0.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(74,222,128,0.15)', color: '#4ade80' }}>
+            <FiTrendingUp size={18} />
           </div>
-        </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium" style={{ color: 'var(--text-1)' }}>Monthly Productivity</span>
+            <span className="text-xs" style={{ color: 'var(--text-3)' }}>{completionRate}% completion rate</span>
+          </div>
+        </Card>
+        <Card className="flex items-center gap-4 p-4 transition-transform hover:-translate-y-0.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(167,139,250,0.15)', color: '#a78bfa' }}>
+            <FiUsers size={18} />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium" style={{ color: 'var(--text-1)' }}>User Performance</span>
+            <span className="text-xs" style={{ color: 'var(--text-3)' }}>{activeContributors} active contributor{activeContributors !== 1 ? 's' : ''}</span>
+          </div>
+        </Card>
       </div>
     </div>
   );

@@ -22,7 +22,11 @@
       "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4MThmMzBkMC03YjY1LTQ1NzgtYjk0Mi0wMWYxYzU2MzdmNTkiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NzIyOTA0MTIsImV4cCI6MTc3MjI5NDAxMn0.uMQt0OFtz3AeDX5tzD2tWy7YniDR4q9Q7KWgTck1beQ\")",
       "Bash(__NEW_LINE_e6bea19cc5a8d266__ echo \"\")",
       "Bash(__NEW_LINE_e87378f60da29e74__ echo \"\")",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(node --version:*)",
+      "Bash(npm --version:*)"
     ]
   }
 }

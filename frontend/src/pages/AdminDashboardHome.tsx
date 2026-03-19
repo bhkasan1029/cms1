@@ -14,8 +14,17 @@ import {
   FiActivity,
   FiPieChart,
 } from 'react-icons/fi';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Legend,
+} from 'recharts';
 import { getTasksApi, getUsersApi } from '../api/auth';
 import type { TaskRecord, UserRecord } from '../api/auth';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type TabKey = 'all' | 'in_progress' | 'pending' | 'completed';
 
@@ -59,7 +68,6 @@ function AdminDashboardHome() {
     if (activeTab === 'completed') return tasks.filter((t) => t.finished);
     if (activeTab === 'in_progress')
       return tasks.filter((t) => t.status === 'in_progress' && !t.finished);
-    // pending = frozen or not started
     return tasks.filter((t) => t.status === 'frozen' && !t.finished);
   }, [tasks, activeTab]);
 
@@ -94,11 +102,6 @@ function AdminDashboardHome() {
     }
     return days;
   }, [tasks]);
-
-  const chartMax = Math.max(
-    1,
-    ...chartData.map((d) => Math.max(d.created, d.completed)),
-  );
 
   // ── Activity feed (recent task updates) ──
   const recentActivity = useMemo(() => {
@@ -197,15 +200,24 @@ function AdminDashboardHome() {
           ? 'Frozen'
           : t.status;
 
+  const tabCounts: Record<TabKey, number> = {
+    all: tasks.length,
+    in_progress: tasks.filter((t) => t.status === 'in_progress' && !t.finished).length,
+    pending: tasks.filter((t) => t.status === 'frozen' && !t.finished).length,
+    completed: tasks.filter((t) => t.finished).length,
+  };
+
   if (loading) {
     return (
-      <div className="db-home">
-        <div className="db-hero">
+      <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-5 gap-4">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="db-hero-card db-hero-skeleton">
-              <div className="td-skeleton-line td-skeleton-title" />
-              <div className="td-skeleton-line" style={{ width: '40%' }} />
-            </div>
+            <Card key={i}>
+              <CardContent className="p-5">
+                <Skeleton className="h-4 w-20 mb-3" />
+                <Skeleton className="h-8 w-14" />
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
@@ -213,403 +225,289 @@ function AdminDashboardHome() {
   }
 
   return (
-    <div className="db-home">
+    <div className="flex flex-col gap-6">
       {/* ── Hero Metrics ── */}
-      <div className="db-hero">
-        <div className="db-hero-card db-hero-tint-blue">
-          <div className="db-hero-icon db-icon-blue">
-            <FiCheckSquare />
-          </div>
-          <div className="db-hero-info">
-            <span className="db-hero-number">{totalTasks}</span>
-            <span className="db-hero-label">Total Tasks</span>
-          </div>
-          <span className="db-hero-trend db-trend-up">
-            <FiTrendingUp size={12} /> Active
-          </span>
-        </div>
-
-        <div className="db-hero-card db-hero-tint-amber">
-          <div className="db-hero-icon db-icon-amber">
-            <FiCalendar />
-          </div>
-          <div className="db-hero-info">
-            <span className="db-hero-number">{tasksDueToday}</span>
-            <span className="db-hero-label">Due Today</span>
-          </div>
-          <span className="db-hero-trend db-trend-neutral">Today</span>
-        </div>
-
-        <div className="db-hero-card db-hero-tint-red">
-          <div className="db-hero-icon db-icon-red">
-            <FiAlertCircle />
-          </div>
-          <div className="db-hero-info">
-            <span className="db-hero-number">{overdueTasks}</span>
-            <span className="db-hero-label">Overdue</span>
-          </div>
-          {overdueTasks > 0 && (
-            <span className="db-hero-trend db-trend-down">Attention</span>
-          )}
-        </div>
-
-        <div className="db-hero-card db-hero-tint-green">
-          <div className="db-hero-icon db-icon-green">
-            <FiTrendingUp />
-          </div>
-          <div className="db-hero-info">
-            <span className="db-hero-number">{completedThisWeek}</span>
-            <span className="db-hero-label">Completed This Week</span>
-          </div>
-          <span className="db-hero-trend db-trend-up">
-            <FiTrendingUp size={12} /> +{completedThisWeek}
-          </span>
-        </div>
-
-        <div className="db-hero-card db-hero-tint-purple">
-          <div className="db-hero-icon db-icon-purple">
-            <FiUsers />
-          </div>
-          <div className="db-hero-info">
-            <span className="db-hero-number">{activeUsers}</span>
-            <span className="db-hero-label">Active Users</span>
-          </div>
-          <span className="db-hero-trend db-trend-up">
-            <FiTrendingUp size={12} /> Online
-          </span>
-        </div>
+      <div className="grid grid-cols-5 gap-4">
+        {[
+          { icon: <FiCheckSquare size={18} />, value: totalTasks, label: 'Total Tasks', tint: 'var(--tint-blue)', iconBg: 'rgba(96,165,250,0.15)', iconColor: '#60a5fa', trend: <><FiTrendingUp size={12} /> Active</>, trendClass: 'bg-green-500/10 text-green-400' },
+          { icon: <FiCalendar size={18} />, value: tasksDueToday, label: 'Due Today', tint: 'var(--tint-amber)', iconBg: 'rgba(251,191,36,0.15)', iconColor: '#fbbf24', trend: 'Today', trendClass: 'bg-yellow-500/10 text-yellow-400' },
+          { icon: <FiAlertCircle size={18} />, value: overdueTasks, label: 'Overdue', tint: 'var(--tint-red)', iconBg: 'rgba(239,68,68,0.1)', iconColor: '#ef4444', trend: overdueTasks > 0 ? 'Attention' : null, trendClass: 'bg-red-500/10 text-red-400' },
+          { icon: <FiTrendingUp size={18} />, value: completedThisWeek, label: 'Completed This Week', tint: 'var(--tint-green)', iconBg: 'rgba(74,222,128,0.15)', iconColor: '#4ade80', trend: <><FiTrendingUp size={12} /> +{completedThisWeek}</>, trendClass: 'bg-green-500/10 text-green-400' },
+          { icon: <FiUsers size={18} />, value: activeUsers, label: 'Active Users', tint: 'var(--tint-purple)', iconBg: 'rgba(167,139,250,0.15)', iconColor: '#a78bfa', trend: <><FiTrendingUp size={12} /> Online</>, trendClass: 'bg-green-500/10 text-green-400' },
+        ].map((m, i) => (
+          <Card key={i} className="transition-transform hover:-translate-y-0.5" style={{ background: m.tint }}>
+            <CardContent className="p-5 flex flex-col gap-3">
+              <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px]" style={{ background: m.iconBg, color: m.iconColor }}>
+                {m.icon}
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[1.75rem] font-bold leading-tight" style={{ color: 'var(--text-1)' }}>{m.value}</span>
+                <span className="text-[0.78rem] font-medium uppercase tracking-wide" style={{ color: 'var(--text-3)' }}>{m.label}</span>
+              </div>
+              {m.trend && (
+                <span className={`inline-flex w-fit items-center gap-1 rounded-md px-2 py-0.5 text-[0.72rem] font-medium ${m.trendClass}`}>
+                  {m.trend}
+                </span>
+              )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* ── Main Content Grid ── */}
-      <div className="db-main-grid">
-        {/* Left Column (8 cols) */}
-        <div className="db-left-col">
+      <div className="grid grid-cols-[2fr_1fr] gap-4">
+        {/* Left Column */}
+        <div className="flex flex-col gap-4">
           {/* Task Overview Panel */}
-          <div className="db-panel">
-            <div className="db-panel-header">
-              <h3 className="db-panel-title">
-                <FiFileText className="db-panel-title-icon" /> Task Overview
-              </h3>
-            </div>
-            <div className="db-tabs">
-              {(
-                [
-                  ['all', 'All'],
-                  ['in_progress', 'In Progress'],
-                  ['pending', 'Pending'],
-                  ['completed', 'Completed'],
-                ] as [TabKey, string][]
-              ).map(([key, label]) => (
-                <button
-                  key={key}
-                  className={`db-tab ${activeTab === key ? 'db-tab-active' : ''}`}
-                  onClick={() => setActiveTab(key)}
-                >
-                  {label}
-                  <span className="db-tab-count">
-                    {key === 'all'
-                      ? tasks.length
-                      : key === 'completed'
-                        ? tasks.filter((t) => t.finished).length
-                        : key === 'in_progress'
-                          ? tasks.filter(
-                              (t) =>
-                                t.status === 'in_progress' && !t.finished,
-                            ).length
-                          : tasks.filter(
-                              (t) => t.status === 'frozen' && !t.finished,
-                            ).length}
-                  </span>
-                </button>
-              ))}
-            </div>
-            <div className="db-task-list">
-              {filteredTasks.length === 0 ? (
-                <div className="db-task-empty">No tasks found</div>
-              ) : (
-                filteredTasks.slice(0, 8).map((t) => (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <FiFileText size={15} style={{ color: 'var(--text-3)' }} /> Task Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* Tabs */}
+              <div className="flex border-b border-border mb-3">
+                {([['all', 'All'], ['in_progress', 'In Progress'], ['pending', 'Pending'], ['completed', 'Completed']] as [TabKey, string][]).map(([key, label]) => (
+                  <button
+                    key={key}
+                    className={`flex items-center gap-1.5 px-4 py-2.5 text-[0.82rem] font-medium border-b-2 transition-colors bg-transparent ${
+                      activeTab === key
+                        ? 'border-blue-400 text-[var(--text-1)]'
+                        : 'border-transparent text-[var(--text-3)] hover:text-[var(--text-4)]'
+                    }`}
+                    style={{ boxShadow: 'none', borderRadius: 0 }}
+                    onClick={() => setActiveTab(key)}
+                  >
+                    {label}
+                    <span className={`text-[0.7rem] px-1.5 py-0.5 rounded ${
+                      activeTab === key ? 'bg-blue-400/15 text-blue-400' : 'bg-[var(--n3)] text-[var(--text-4)]'
+                    }`}>
+                      {tabCounts[key]}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {/* Task List */}
+              <div className="max-h-[380px] overflow-y-auto flex flex-col gap-1">
+                {filteredTasks.length === 0 ? (
+                  <p className="py-8 text-center text-sm" style={{ color: 'var(--text-3)' }}>No tasks found</p>
+                ) : filteredTasks.slice(0, 8).map((t) => (
                   <div
                     key={t.id}
-                    className="db-task-row"
+                    className="flex items-center justify-between gap-4 px-3 py-2.5 rounded-[10px] cursor-pointer transition-colors hover:bg-[var(--n1)]"
                     onClick={() => navigate(`/tasks/${t.id}`)}
                   >
-                    <div className="db-task-row-left">
-                      <span className="db-task-row-title">{t.title}</span>
-                      <span
-                        className={`db-task-row-priority db-priority-${t.priority}`}
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <span className="text-[0.85rem] font-medium truncate" style={{ color: 'var(--text-1)' }}>{t.title}</span>
+                      <Badge
+                        variant={t.priority === 'urgent' ? 'destructive' : 'secondary'}
+                        className="text-[0.68rem] shrink-0"
+                        style={
+                          t.priority === 'low' ? { background: 'rgba(74,222,128,0.12)', color: '#4ade80' } :
+                          t.priority === 'medium' ? { background: 'rgba(251,191,36,0.12)', color: '#fbbf24' } :
+                          undefined
+                        }
                       >
                         {priorityLabel(t.priority)}
-                      </span>
+                      </Badge>
                     </div>
-                    <div className="db-task-row-right">
-                      <span className="db-task-row-due">
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-3)' }}>
                         <FiClock size={12} />
-                        {new Date(t.dueDate).toLocaleDateString('en', {
-                          month: 'short',
-                          day: 'numeric',
-                        })}
+                        {new Date(t.dueDate).toLocaleDateString('en', { month: 'short', day: 'numeric' })}
                       </span>
                       {t.assignedTo && (
-                        <div className="db-task-row-avatar" title={`${t.assignedTo.firstName} ${t.assignedTo.lastName}`}>
-                          {getInitials(
-                            t.assignedTo.firstName,
-                            t.assignedTo.lastName,
-                          )}
+                        <div className="flex h-[26px] w-[26px] items-center justify-center rounded-full text-[0.62rem] font-semibold shrink-0" style={{ background: 'rgba(167,139,250,0.15)', color: '#a78bfa' }} title={`${t.assignedTo.firstName} ${t.assignedTo.lastName}`}>
+                          {getInitials(t.assignedTo.firstName, t.assignedTo.lastName)}
                         </div>
                       )}
-                      <span
-                        className={`db-task-row-status ${
-                          t.finished
-                            ? 'db-status-completed'
-                            : t.status === 'in_progress'
-                              ? 'db-status-progress'
-                              : 'db-status-frozen'
-                        }`}
+                      <Badge
+                        variant="outline"
+                        className="text-[0.68rem]"
+                        style={{
+                          borderColor: t.finished ? '#4ade80' : t.status === 'in_progress' ? '#60a5fa' : '#94a3b8',
+                          color: t.finished ? '#4ade80' : t.status === 'in_progress' ? '#60a5fa' : '#94a3b8',
+                        }}
                       >
                         {statusLabel(t)}
-                      </span>
+                      </Badge>
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Productivity & Task Flow */}
-          <div className="db-panel">
-            <div className="db-panel-header">
-              <h3 className="db-panel-title">
-                <FiBarChart2 className="db-panel-title-icon" /> Productivity &
-                Task Flow
-              </h3>
-              <span className="db-chart-range">Last 7 days</span>
-            </div>
-            <div className="db-chart">
-              <div className="db-chart-legend">
-                <span className="db-legend-item">
-                  <span className="db-legend-dot db-legend-created" /> Created
-                </span>
-                <span className="db-legend-item">
-                  <span className="db-legend-dot db-legend-completed" />{' '}
-                  Completed
-                </span>
-              </div>
-              <div className="db-chart-bars">
-                {chartData.map((d, i) => (
-                  <div key={i} className="db-chart-col">
-                    <div className="db-chart-bar-group">
-                      <div
-                        className="db-chart-bar db-bar-created"
-                        style={{
-                          height: `${(d.created / chartMax) * 100}%`,
-                        }}
-                        title={`Created: ${d.created}`}
-                      />
-                      <div
-                        className="db-chart-bar db-bar-completed"
-                        style={{
-                          height: `${(d.completed / chartMax) * 100}%`,
-                        }}
-                        title={`Completed: ${d.completed}`}
-                      />
-                    </div>
-                    <span className="db-chart-label">{d.label}</span>
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
+
+          {/* Productivity & Task Flow */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <FiBarChart2 size={15} style={{ color: 'var(--text-3)' }} /> Productivity & Task Flow
+              </CardTitle>
+              <span className="text-xs px-2.5 py-1 rounded-md" style={{ background: 'var(--n5)', color: 'var(--text-3)' }}>Last 7 days</span>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={chartData} barGap={2}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--n4)" />
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'var(--text-3)' }} />
+                  <YAxis tick={{ fontSize: 11, fill: 'var(--text-4)' }} allowDecimals={false} />
+                  <Tooltip contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--n5)', borderRadius: 8, fontSize: 12, color: 'var(--text-1)' }} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: 'var(--text-3)' }} />
+                  <Bar dataKey="created" name="Created" fill="#60a5fa" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="completed" name="Completed" fill="#4ade80" radius={[3, 3, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Right Column (4 cols) */}
-        <div className="db-right-col">
+        {/* Right Column */}
+        <div className="flex flex-col gap-4">
           {/* Quick Actions */}
-          <div className="db-panel">
-            <h3 className="db-panel-title">Quick Actions</h3>
-            <div className="db-quick-actions">
-              <button
-                className="db-qa-btn db-qa-primary"
-                onClick={() => navigate('/create-task')}
-              >
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2">
+              <Button className="justify-start gap-2.5 w-full" style={{ background: 'rgba(96,165,250,0.15)', color: '#60a5fa' }} onClick={() => navigate('/create-task')}>
                 <FiPlus /> Create New Task
-              </button>
-              <button
-                className="db-qa-btn db-qa-secondary"
-                onClick={() => navigate('/tasks')}
-              >
+              </Button>
+              <Button variant="ghost" className="justify-start gap-2.5 w-full" onClick={() => navigate('/tasks')}>
                 <FiUserPlus /> Assign Task
-              </button>
-              <button
-                className="db-qa-btn db-qa-secondary"
-                onClick={() => navigate('/report')}
-              >
+              </Button>
+              <Button variant="ghost" className="justify-start gap-2.5 w-full" onClick={() => navigate('/report')}>
                 <FiBarChart2 /> View Reports
-              </button>
-            </div>
-          </div>
+              </Button>
+            </CardContent>
+          </Card>
 
           {/* Upcoming Deadlines */}
-          <div className="db-panel">
-            <h3 className="db-panel-title">
-              <FiClock className="db-panel-title-icon" /> Upcoming Deadlines
-            </h3>
-            <div className="db-deadlines">
-              {upcomingDeadlines.length === 0 ? (
-                <div className="db-task-empty">No upcoming deadlines</div>
-              ) : (
-                upcomingDeadlines.map((t) => (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <FiClock size={15} style={{ color: 'var(--text-3)' }} /> Upcoming Deadlines
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-1">
+                {upcomingDeadlines.length === 0 ? (
+                  <p className="py-8 text-center text-sm" style={{ color: 'var(--text-3)' }}>No upcoming deadlines</p>
+                ) : upcomingDeadlines.map((t) => (
                   <div
                     key={t.id}
-                    className="db-deadline-item"
+                    className="flex items-stretch gap-3 px-3 py-2.5 rounded-[10px] cursor-pointer transition-colors hover:bg-[var(--n1)]"
                     onClick={() => navigate(`/tasks/${t.id}`)}
                   >
-                    <div
-                      className={`db-deadline-strip db-priority-strip-${t.priority}`}
-                    />
-                    <div className="db-deadline-info">
-                      <span className="db-deadline-name">{t.title}</span>
-                      <span className="db-deadline-time">
-                        {countdown(t.dueDate)}
-                      </span>
+                    <div className="w-[3px] shrink-0 rounded-full" style={{ background: t.priority === 'urgent' ? '#ef4444' : t.priority === 'medium' ? '#fbbf24' : '#4ade80' }} />
+                    <div className="flex flex-col gap-0.5 min-w-0">
+                      <span className="text-[0.83rem] font-medium truncate" style={{ color: 'var(--text-1)' }}>{t.title}</span>
+                      <span className="text-[0.72rem]" style={{ color: 'var(--text-3)' }}>{countdown(t.dueDate)}</span>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
-          </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* ── Secondary Section ── */}
-      <div className="db-secondary-grid">
+      <div className="grid grid-cols-3 gap-4">
         {/* Activity Feed */}
-        <div className="db-panel db-activity-panel">
-          <h3 className="db-panel-title">
-            <FiActivity className="db-panel-title-icon" /> Recent Activity
-          </h3>
-          <div className="db-activity-feed">
-            {recentActivity.length === 0 ? (
-              <div className="db-task-empty">No recent activity</div>
-            ) : (
-              recentActivity.map((a, i) => (
-                <div key={i} className="db-activity-item">
-                  <div
-                    className={`db-activity-dot ${
-                      a.type === 'completed'
-                        ? 'db-dot-green'
-                        : a.type === 'assigned'
-                          ? 'db-dot-blue'
-                          : 'db-dot-amber'
-                    }`}
-                  />
-                  <div className="db-activity-content">
-                    <span className="db-activity-text">{a.text}</span>
-                    <span className="db-activity-time">{timeAgo(a.time)}</span>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <FiActivity size={15} style={{ color: 'var(--text-3)' }} /> Recent Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="max-h-[280px] overflow-y-auto flex flex-col gap-2">
+              {recentActivity.length === 0 ? (
+                <p className="py-8 text-center text-sm" style={{ color: 'var(--text-3)' }}>No recent activity</p>
+              ) : recentActivity.map((a, i) => (
+                <div key={i} className="flex items-start gap-2.5 py-2 border-b border-[var(--n1)] last:border-0">
+                  <div className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: a.type === 'completed' ? '#4ade80' : a.type === 'assigned' ? '#60a5fa' : '#fbbf24' }} />
+                  <div className="flex flex-col gap-0.5 min-w-0">
+                    <span className="text-[0.8rem] leading-snug" style={{ color: 'var(--text-2)' }}>{a.text}</span>
+                    <span className="text-[0.7rem]" style={{ color: 'var(--text-5)' }}>{timeAgo(a.time)}</span>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* User Snapshot */}
-        <div className="db-panel">
-          <h3 className="db-panel-title">
-            <FiUsers className="db-panel-title-icon" /> Team Overview
-          </h3>
-          <div className="db-user-snapshot">
-            {userSnapshot.map((u) => (
-              <div
-                key={u.id}
-                className="db-user-snap-row"
-                onClick={() => navigate(`/profile/${u.id}`)}
-              >
-                <div className="db-user-snap-left">
-                  <div className="db-user-snap-avatar">
-                    {u.name
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')
-                      .toUpperCase()}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <FiUsers size={15} style={{ color: 'var(--text-3)' }} /> Team Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-1">
+              {userSnapshot.map((u) => (
+                <div
+                  key={u.id}
+                  className="flex items-center justify-between px-2.5 py-2 rounded-[10px] cursor-pointer transition-colors hover:bg-[var(--n1)]"
+                  onClick={() => navigate(`/profile/${u.id}`)}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="flex h-[30px] w-[30px] items-center justify-center rounded-full text-[0.65rem] font-semibold shrink-0" style={{ background: 'rgba(167,139,250,0.15)', color: '#a78bfa' }}>
+                      {u.name.split(' ').map((n) => n[0]).join('').toUpperCase()}
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[0.82rem] font-medium truncate" style={{ color: 'var(--text-1)' }}>{u.name}</span>
+                      <span className="text-[0.7rem] capitalize" style={{ color: 'var(--text-3)' }}>{u.role}</span>
+                    </div>
                   </div>
-                  <div className="db-user-snap-info">
-                    <span className="db-user-snap-name">{u.name}</span>
-                    <span className="db-user-snap-role">{u.role}</span>
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-[0.72rem]" style={{ color: 'var(--text-3)' }}>{u.taskCount} tasks</span>
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ background: u.online ? '#4ade80' : '#4b5563', boxShadow: u.online ? 'var(--glow-green)' : 'none' }} />
                   </div>
                 </div>
-                <div className="db-user-snap-right">
-                  <span className="db-user-snap-tasks">
-                    {u.taskCount} tasks
-                  </span>
-                  <span
-                    className={`db-user-snap-status ${u.online ? 'db-snap-online' : 'db-snap-offline'}`}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Reports Preview */}
-        <div className="db-panel">
-          <h3 className="db-panel-title">
-            <FiPieChart className="db-panel-title-icon" /> Reports Preview
-          </h3>
-          <div className="db-report-cards">
-            <div
-              className="db-report-card"
-              onClick={() => navigate('/report')}
-            >
-              <div className="db-report-icon db-icon-green">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <FiPieChart size={15} style={{ color: 'var(--text-3)' }} /> Reports Preview
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2.5">
+            <Card className="flex flex-col items-center gap-1.5 p-4 cursor-pointer transition-transform hover:-translate-y-0.5" onClick={() => navigate('/report')}>
+              <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px]" style={{ background: 'rgba(74,222,128,0.15)', color: '#4ade80' }}>
                 <FiTrendingUp />
               </div>
-              <span className="db-report-value">{completionRate}%</span>
-              <span className="db-report-label">Completion Rate</span>
-            </div>
-            <div
-              className="db-report-card"
-              onClick={() => navigate('/report')}
-            >
-              <div className="db-report-icon db-icon-blue">
+              <span className="text-[1.35rem] font-bold" style={{ color: 'var(--text-1)' }}>{completionRate}%</span>
+              <span className="text-[0.72rem] text-center" style={{ color: 'var(--text-3)' }}>Completion Rate</span>
+            </Card>
+            <Card className="flex flex-col items-center gap-1.5 p-4 cursor-pointer transition-transform hover:-translate-y-0.5" onClick={() => navigate('/report')}>
+              <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px]" style={{ background: 'rgba(96,165,250,0.15)', color: '#60a5fa' }}>
                 <FiUsers />
               </div>
-              <span className="db-report-value">{activeUsers}</span>
-              <span className="db-report-label">Workload Distribution</span>
-            </div>
-            <div
-              className="db-report-card"
-              onClick={() => navigate('/report')}
-            >
-              <div className="db-report-icon db-icon-amber">
+              <span className="text-[1.35rem] font-bold" style={{ color: 'var(--text-1)' }}>{activeUsers}</span>
+              <span className="text-[0.72rem] text-center" style={{ color: 'var(--text-3)' }}>Workload Distribution</span>
+            </Card>
+            <Card className="flex flex-col items-center gap-1.5 p-4 cursor-pointer transition-transform hover:-translate-y-0.5" onClick={() => navigate('/report')}>
+              <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px]" style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24' }}>
                 <FiPieChart />
               </div>
-              <div className="db-report-priority-bar">
-                <div
-                  className="db-rpb-segment db-rpb-low"
-                  style={{
-                    flex: priorityBreakdown.low || 0.1,
-                  }}
-                  title={`Low: ${priorityBreakdown.low}`}
-                />
-                <div
-                  className="db-rpb-segment db-rpb-medium"
-                  style={{
-                    flex: priorityBreakdown.medium || 0.1,
-                  }}
-                  title={`Medium: ${priorityBreakdown.medium}`}
-                />
-                <div
-                  className="db-rpb-segment db-rpb-urgent"
-                  style={{
-                    flex: priorityBreakdown.urgent || 0.1,
-                  }}
-                  title={`Urgent: ${priorityBreakdown.urgent}`}
-                />
+              <div className="flex w-full h-2 rounded gap-0.5 overflow-hidden my-1">
+                <div className="rounded" style={{ flex: priorityBreakdown.low || 0.1, background: '#4ade80' }} />
+                <div className="rounded" style={{ flex: priorityBreakdown.medium || 0.1, background: '#fbbf24' }} />
+                <div className="rounded" style={{ flex: priorityBreakdown.urgent || 0.1, background: '#ef4444' }} />
               </div>
-              <span className="db-report-label">Priority Breakdown</span>
-            </div>
-          </div>
-        </div>
+              <span className="text-[0.72rem] text-center" style={{ color: 'var(--text-3)' }}>Priority Breakdown</span>
+            </Card>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
