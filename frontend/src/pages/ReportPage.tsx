@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   FiTrendingUp,
   FiClock,
@@ -14,7 +14,10 @@ import {
   FiBarChart2,
   FiFileText,
   FiCalendar,
+  FiDownload,
 } from 'react-icons/fi';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   PieChart, Pie, Cell, ResponsiveContainer, Legend,
@@ -43,6 +46,8 @@ const PAGE_SIZE = 8;
 const STATUS_COLORS = ['#4ade80', '#60a5fa', '#94a3b8', '#ef4444'];
 
 function ReportPage() {
+  const reportRef = useRef<HTMLDivElement>(null);
+  const [exporting, setExporting] = useState(false);
   const [tasks, setTasks] = useState<TaskRecord[]>([]);
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -292,6 +297,41 @@ function ReportPage() {
     setTablePage(0);
   }, [tableSort]);
 
+  const handleExportPdf = useCallback(async () => {
+    if (!reportRef.current || exporting) return;
+    setExporting(true);
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null,
+      });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let position = 0;
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      let remaining = imgHeight - pageHeight;
+      while (remaining > 0) {
+        position -= pageHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        remaining -= pageHeight;
+      }
+
+      const date = new Date().toISOString().slice(0, 10);
+      pdf.save(`report-${date}.pdf`);
+    } catch (err) {
+      console.error('PDF export failed', err);
+    } finally {
+      setExporting(false);
+    }
+  }, [exporting]);
+
   function getInitials(first: string, last: string) {
     return `${first?.[0] || ''}${last?.[0] || ''}`.toUpperCase();
   }
@@ -399,7 +439,20 @@ function ReportPage() {
             </SelectContent>
           </Select>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto gap-1.5"
+          disabled={exporting}
+          onClick={handleExportPdf}
+        >
+          <FiDownload size={14} />
+          {exporting ? 'Exporting…' : 'Export PDF'}
+        </Button>
       </div>
+
+      {/* ── Report Content (captured for PDF) ── */}
+      <div ref={reportRef} className="flex flex-col gap-6">
 
       {/* ── Key Metrics ── */}
       <div className="grid grid-cols-5 gap-4">
@@ -858,6 +911,7 @@ function ReportPage() {
             <span className="text-xs" style={{ color: 'var(--text-3)' }}>{activeContributors} active contributor{activeContributors !== 1 ? 's' : ''}</span>
           </div>
         </Card>
+      </div>
       </div>
     </div>
   );

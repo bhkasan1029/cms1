@@ -14,6 +14,7 @@ import UserManagementPage from './pages/UserManagementPage';
 import AccountPage from './pages/AccountPage';
 import ProfilePage from './pages/ProfilePage';
 import TaskDetailPage from './pages/TaskDetailPage';
+import LandingPage from './pages/LandingPage';
 import './App.css';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
       <AuthProvider>
       <NotificationProvider>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route element={<ProtectedRoute />}>
@@ -37,7 +39,7 @@ function App() {
               <Route path="/profile/:userId" element={<ProfilePage />} />
             </Route>
           </Route>
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </NotificationProvider>
       </AuthProvider>

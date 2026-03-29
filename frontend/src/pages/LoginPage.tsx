@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { signupApi, forgotPasswordApi } from '../api/auth';
 import axios from 'axios';
+import { BackgroundPaths } from '@/components/ui/background-paths';
 
 type Mode = 'login' | 'signup' | 'forgot';
 
@@ -127,7 +128,34 @@ function LoginPage() {
   }
 
   return (
-    <div className="login-container">
+    <div style={{ position: 'fixed', inset: 0 }}>
+      {/* Animated paths — bottom layer */}
+      <BackgroundPaths />
+
+      {/* Glass overlay — middle layer */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 1,
+          background: 'rgba(255, 255, 255, 0.06)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+        }}
+      />
+
+      {/* Form — top layer */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+        }}
+      >
+      <div className="login-container">
       {mode === 'login' && (
         <>
           <h1>Sign In</h1>
@@ -336,6 +364,8 @@ function LoginPage() {
           </p>
         </>
       )}
+    </div>
+    </div>
     </div>
   );
 }

@@ -1,0 +1,1451 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 6393
+>>
+stream
+0.5670000000000001 w
+0 G
+BT
+/F2 20 Tf
+23. TL
+0.118 g
+163.8399999999999466 785.1970866141732586 Td
+(slateCMS Session Summary) Tj
+ET
+BT
+/F1 11 Tf
+12.6499999999999986 TL
+0.392 g
+177.9599999999999227 756.8506299212598378 Td
+(Conversation Summary - All Changes & Features) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 711.4962992125983874 Td
+(1. CSS Cleanup \(App.css\)) Tj
+ET
+0.78 G
+51.0236220472441033 702.9923622047243725 m
+544.2563779527558836 702.9923622047243725 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 685.9844881889763428 Td
+(Removed ~980 lines of obsolete CSS classes that were replaced during the shadcn/Tailwind migration:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 666.1419685039369369 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 666.1419685039369369 Td
+(.db-* classes \(old dashboard layout\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 649.1340944881889072 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 649.1340944881889072 Td
+(.stat-cards, .stat-card, .stat-label, .stat-value) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 632.1262204724408775 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 632.1262204724408775 Td
+(.dashboard-section, .placeholder-text, .admin-panel) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 615.1183464566928478 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 615.1183464566928478 Td
+(.user-table, .role-select \(temporarily removed, later restored\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 598.1104724409448181 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 598.1104724409448181 Td
+(.user-name-link, .user-row-*, .user-status-badge, .user-badge-*) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 581.1025984251967884 Td
+(Preserved: .dashboard-panel h2 and .dashboard-panel p \(used by TaskDetailPage\).) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 561.2600787401574962 Td
+(Later restored user management CSS classes when UserManagementPage was reverted to original.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 530.0789763779526993 Td
+(2. Task Card Color Tuning) Tj
+ET
+0.78 G
+51.0236220472441033 521.5750393700786844 m
+544.2563779527558836 521.5750393700786844 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 504.5671653543306547 Td
+(Iteratively adjusted the task page card background color through several rounds of user feedback.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 484.7246456692913057 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 484.7246456692913057 Td
+(Started at black, then lighter, then slightly darker) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 467.716771653543276 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 467.716771653543276 Td
+(Final values: background #151515, hover #1d1d1d) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 450.7088976377952463 Td
+(Applied to .td-card in App.css.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 419.5277952755905062 Td
+(3. User Management Page) Tj
+ET
+0.78 G
+51.0236220472441033 411.0238582677164914 m
+544.2563779527558836 411.0238582677164914 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 394.0159842519684616 Td
+(Went through multiple iterations:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 374.1734645669290558 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 374.1734645669290558 Td
+(Initially attempted to move title outside the shadcn Card component) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 357.1655905511810261 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 357.1655905511810261 Td
+(Then tried individual glass-effect cards per user) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 340.1577165354329964 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 340.1577165354329964 Td
+(Finally fully restored the original pre-shadcn UserManagementPage with vanilla CSS) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 323.1498425196849666 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 323.1498425196849666 Td
+(Added "User Management" title with inline styles) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 306.1419685039369369 Td
+(File: frontend/src/pages/UserManagementPage.tsx) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 286.2994488188975311 Td
+(Uses original CSS classes: .user-table, .role-select, .user-name-link, etc.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 255.1183464566928478 Td
+(4. PDF Export for Reports Page) Tj
+ET
+0.78 G
+51.0236220472441033 246.6144094488188045 m
+544.2563779527558836 246.6144094488188045 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 229.6065354330708033 Td
+(Replaced the old CSV export feature with a PDF export using html2canvas + jsPDF.) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.235 g
+56.6929133858267775 204.0947244094487587 Td
+(Implementation:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 187.086850393700729 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 187.086850393700729 Td
+(Added useRef on report content container) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 170.0789763779526993 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 170.0789763779526993 Td
+(html2canvas captures the rendered page \(charts, metrics, tables\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 153.0711023622046696 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 153.0711023622046696 Td
+(jsPDF creates landscape A4 PDF with multi-page support) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 136.0632283464566399 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 136.0632283464566399 Td
+("Export PDF" button with FiDownload icon placed next to date range filters) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 119.0553543307086102 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 119.0553543307086102 Td
+(Downloads as report-YYYY-MM-DD.pdf) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 102.0474803149605805 Td
+(Dependencies installed: html2canvas, jspdf) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 82.2049606299211746 Td
+(File: frontend/src/pages/ReportPage.tsx) Tj
+ET
+endstream
+endobj
+5 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 6 0 R
+>>
+endobj
+6 0 obj
+<<
+/Length 6609
+>>
+stream
+0.5670000000000001 w
+0.78 G
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 773.8585039370078675 Td
+(5. Floating Action Menu \(Header Dropdown\)) Tj
+ET
+0.78 G
+51.0236220472441033 765.3545669291338527 m
+544.2563779527558836 765.3545669291338527 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 748.346692913385823 Td
+(Integrated a custom animated dropdown menu component to replace the old header profile dropdown.) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.235 g
+56.6929133858267775 722.8348818897637784 Td
+(Component: floating-action-menu.tsx) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 705.8270078740157487 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 705.8270078740157487 Td
+(Built with framer-motion \(AnimatePresence, motion.div\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 688.819133858267719 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 688.819133858267719 Td
+(Extended with props: trigger, isOpen, onToggle, direction) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 671.8112598425196893 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 671.8112598425196893 Td
+(Menu items use solid #2a2a2a background, #d4d4d4 text color) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 654.8033858267716596 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 654.8033858267716596 Td
+(whileHover={{ scale: 1.05 }} for subtle hover animation) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 637.7955118110235162 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 637.7955118110235162 Td
+(Spring animations: 0.5s toggle rotation, 0.8s menu appear) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.235 g
+56.6929133858267775 615.1183464566928478 Td
+(Header Integration:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 598.1104724409448181 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 598.1104724409448181 Td
+(Replaced old dropdown in Header.tsx) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 581.1025984251967884 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 581.1025984251967884 Td
+(Uses direction="down", controlled state via isOpen/onToggle) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 564.0947244094487587 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 564.0947244094487587 Td
+(Three options: Account \(navigates to /account\), Settings \(opens modal\), Logout) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 547.086850393700729 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 547.086850393700729 Td
+(Uses lucide-react icons: User, Settings, LogOut) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 518.7403937007873083 Td
+(6. Landing Page) Tj
+ET
+0.78 G
+51.0236220472441033 510.2364566929133503 m
+544.2563779527558836 510.2364566929133503 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 493.2285826771653205 Td
+(Created a new landing page as the app entry point using an animated SVG background component.) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.235 g
+56.6929133858267775 467.716771653543276 Td
+(Components:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 450.7088976377952463 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 450.7088976377952463 Td
+(background-paths.tsx: Animated floating SVG paths with framer-motion) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 433.7010236220471597 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 433.7010236220471597 Td
+(LandingPage.tsx: "slateCMS" title with letter-by-letter spring animation, subtitle, "Get Started" button) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.235 g
+56.6929133858267775 411.0238582677164914 Td
+(Routing:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 394.0159842519684616 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 394.0159842519684616 Td
+(Added / route for LandingPage in App.tsx) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 377.0081102362204319 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 377.0081102362204319 Td
+(Changed catch-all redirect from /dashboard to /) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 348.6616535433070112 Td
+(7. Login Page Glassmorphism) Tj
+ET
+0.78 G
+51.0236220472441033 340.1577165354329964 m
+544.2563779527558836 340.1577165354329964 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 323.1498425196849666 Td
+(Added a three-layer glassmorphism effect to the login/signup/forgot password page.) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.235 g
+56.6929133858267775 297.6380314960629221 Td
+(Layer Structure:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 280.6301574803148924 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 280.6301574803148924 Td
+(Bottom: BackgroundPaths animated SVG component) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 263.6222834645668627 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 263.6222834645668627 Td
+(Middle: Glass overlay \(z-index 1\) - rgba\(255,255,255,0.06\) background, backdrop-filter: blur\(14px\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 246.614409448818833 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 246.614409448818833 Td
+(Top: Login form container \(z-index 2\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 229.6065354330708033 Td
+(All wrapped in a position: fixed, inset: 0 container.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 209.7640157480313974 Td
+(Blur value iterated: 24px -> 18px -> 14px \(final\).) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 189.9214960629919915 Td
+(File: frontend/src/pages/LoginPage.tsx) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 158.7403937007873083 Td
+(8. Settings Cleanup) Tj
+ET
+0.78 G
+51.0236220472441033 150.2364566929132934 m
+544.2563779527558836 150.2364566929132934 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 133.2285826771652637 Td
+(Removed non-functional settings options from the Settings modal in Header.tsx.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 113.3860629921258578 Td
+(Kept only working options:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 93.5435433070865656 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 93.5435433070865656 Td
+(Change Password) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 76.5356692913385359 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 76.5356692913385359 Td
+(Email Notifications \(toggle\)) Tj
+ET
+endstream
+endobj
+7 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 8 0 R
+>>
+endobj
+8 0 obj
+<<
+/Length 6705
+>>
+stream
+0.5670000000000001 w
+0.78 G
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 785.1970866141732586 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 785.1970866141732586 Td
+(Theme \(light/dark toggle\)) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 756.8506299212598378 Td
+(9. Dashboard Architecture PDF) Tj
+ET
+0.78 G
+51.0236220472441033 748.346692913385823 m
+544.2563779527558836 748.346692913385823 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 731.3388188976377933 Td
+(Generated a PDF documenting the role-based dashboard routing system.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 711.4962992125983874 Td
+(Files involved: DashboardPage.tsx \(layout shell\), DashboardHome.tsx \(role router\), AdminDashboard.tsx,) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 697.3230708661417339 Td
+(ReviewerDashboard.tsx, UserDashboard.tsx.) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 666.1419685039369369 Td
+(10. Overdue Tasks Handling) Tj
+ET
+0.78 G
+51.0236220472441033 657.6380314960629221 m
+544.2563779527558836 657.6380314960629221 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 640.6301574803148924 Td
+(Overdue task detection is purely frontend — no backend status field.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 620.7876377952754865 Td
+(Logic: A task is "overdue" if it has a dueDate in the past AND is not marked as finished.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 600.9451181102361943 Td
+(Code pattern: !task.finished && new Date\(task.dueDate\) < new Date\(\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+56.6929133858267775 581.1025984251967884 Td
+(Used in: DashboardHome.tsx \(stats\), TasksPage.tsx \(badge\), ReportPage.tsx \(metrics\).) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 549.9214960629921052 Td
+(Files Modified / Created) Tj
+ET
+0.78 G
+51.0236220472441033 541.4175590551180903 m
+544.2563779527558836 541.4175590551180903 l
+S
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 524.4096850393700606 Td
+(•) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 524.4096850393700606 Td
+(frontend/src/App.css) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+85.0393700787401627 510.2364566929133503 Td
+(Major CSS cleanup \(~980 lines removed\), task card colors, restored user management CSS) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 490.3939370078739444 Td
+(•) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 490.3939370078739444 Td
+(frontend/src/App.tsx) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+85.0393700787401627 476.2207086614172908 Td
+(Added / route for LandingPage, updated catch-all redirect) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 456.378188976377885 Td
+(•) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 456.378188976377885 Td
+(frontend/src/pages/UserManagementPage.tsx) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+85.0393700787401627 442.2049606299212314 Td
+(Restored to original pre-shadcn version, added title) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 422.3624409448818255 Td
+(•) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 422.3624409448818255 Td
+(frontend/src/pages/ReportPage.tsx) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+85.0393700787401627 408.1892125984251152 Td
+(Added PDF export with html2canvas + jsPDF) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 388.3466929133857661 Td
+(•) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 388.3466929133857661 Td
+(frontend/src/pages/LoginPage.tsx) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+85.0393700787401627 374.1734645669290558 Td
+(Added three-layer glassmorphism with BackgroundPaths) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 354.3309448818897067 Td
+(•) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 354.3309448818897067 Td
+(frontend/src/pages/LandingPage.tsx \(new\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+85.0393700787401627 340.1577165354329964 Td
+(Landing page with animated title and background) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 320.3151968503935905 Td
+(•) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 320.3151968503935905 Td
+(frontend/src/components/Header.tsx) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+85.0393700787401627 306.1419685039369369 Td
+(FloatingActionMenu integration, settings cleanup) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 286.2994488188975311 Td
+(•) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 286.2994488188975311 Td
+(frontend/src/components/ui/floating-action-menu.tsx \(new\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+85.0393700787401627 272.1262204724408775 Td
+(Animated dropdown menu component) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 252.2837007874014716 Td
+(•) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 252.2837007874014716 Td
+(frontend/src/components/ui/background-paths.tsx \(new\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+85.0393700787401627 238.1104724409448181 Td
+(Animated SVG background component) Tj
+ET
+BT
+/F2 13 Tf
+14.9499999999999993 TL
+0.157 g
+51.0236220472441033 206.9293700787401349 Td
+(Key Technical Notes) Tj
+ET
+0.78 G
+51.0236220472441033 198.4254330708660632 m
+544.2563779527558836 198.4254330708660632 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 181.4175590551179766 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 181.4175590551179766 Td
+(CSS variable --n5 in dark mode is rgba\(255,255,255,0.06\) — essentially transparent. Use solid colors) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 167.2443307086613231 Td
+(for visible UI elements.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 150.2364566929132934 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 150.2364566929132934 Td
+(html2canvas captures rendered DOM including Recharts SVG charts — no need to rebuild charts for) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 136.0632283464566399 Td
+(PDF.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 119.0553543307086102 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 119.0553543307086102 Td
+(framer-motion AnimatePresence requires children to have unique keys for exit animations.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 102.0474803149605805 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 102.0474803149605805 Td
+(FloatingActionMenu supports both controlled \(isOpen/onToggle\) and uncontrolled \(internal state\) modes.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 85.0396062992125508 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 85.0396062992125508 Td
+(BackgroundPaths uses position: absolute with overflow: hidden — parent needs position: relative or) Tj
+ET
+endstream
+endobj
+9 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 10 0 R
+>>
+endobj
+10 0 obj
+<<
+/Length 468
+>>
+stream
+0.5670000000000001 w
+0.78 G
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 785.1970866141732586 Td
+(fixed.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+62.3622047244094517 768.1892125984252289 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 768.1892125984252289 Td
+(z-index layering on login page: always set explicit z-index on each layer to avoid stacking context) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.196 g
+79.3700787401574814 754.0159842519684616 Td
+(issues.) Tj
+ET
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R 5 0 R 7 0 R 9 0 R ]
+/Count 4
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+19 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+20 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+21 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+22 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+23 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+24 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 11 0 R
+/F2 12 0 R
+/F3 13 0 R
+/F4 14 0 R
+/F5 15 0 R
+/F6 16 0 R
+/F7 17 0 R
+/F8 18 0 R
+/F9 19 0 R
+/F10 20 0 R
+/F11 21 0 R
+/F12 22 0 R
+/F13 23 0 R
+/F14 24 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+25 0 obj
+<<
+/Producer (jsPDF 4.2.1)
+/CreationDate (D:20260322212307+05'30')
+>>
+endobj
+26 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 27
+0000000000 65535 f 
+0000020947 00000 n 
+0000022787 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000006597 00000 n 
+0000006734 00000 n 
+0000013395 00000 n 
+0000013532 00000 n 
+0000020289 00000 n 
+0000020427 00000 n 
+0000021022 00000 n 
+0000021148 00000 n 
+0000021279 00000 n 
+0000021413 00000 n 
+0000021551 00000 n 
+0000021675 00000 n 
+0000021804 00000 n 
+0000021936 00000 n 
+0000022072 00000 n 
+0000022200 00000 n 
+0000022327 00000 n 
+0000022456 00000 n 
+0000022589 00000 n 
+0000022691 00000 n 
+0000023040 00000 n 
+0000023126 00000 n 
+trailer
+<<
+/Size 27
+/Root 26 0 R
+/Info 25 0 R
+/ID [ <E7EC7DE250449F56BDCDEC6EF66135AE> <E7EC7DE250449F56BDCDEC6EF66135AE> ]
+>>
+startxref
+23230
+%%EOF

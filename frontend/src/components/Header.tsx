@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiBell, FiUser, FiSettings, FiLogOut, FiUserCheck, FiX, FiSun, FiMoon } from 'react-icons/fi';
+import { Settings, User, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useNotifications } from '../context/NotificationContext';
 import { changePasswordApi, getAccountApi, updateEmailNotificationsApi } from '../api/auth';
 import NotificationPanel from './NotificationPanel';
+import FloatingActionMenu from '@/components/ui/floating-action-menu';
 
 interface HeaderProps {
   sidebarCollapsed?: boolean;
@@ -134,36 +136,34 @@ function Header({ sidebarCollapsed }: HeaderProps) {
           </button>
 
           <div className="header-profile" ref={dropdownRef}>
-            <button
-              className="header-avatar"
-              onClick={() => setDropdownOpen((prev) => !prev)}
-              title="Profile"
-            >
-              <FiUser />
-            </button>
-
-            {dropdownOpen && (
-              <div className="header-dropdown">
-                <div className="header-dropdown-info header-dropdown-clickable" onClick={goToAccount}>
-                  <span className="header-dropdown-name">{user?.username}</span>
-                  <span className="header-dropdown-role">{user?.role}</span>
-                </div>
-                <div className="header-dropdown-divider" />
-                <button className="header-dropdown-item" onClick={goToAccount}>
-                  <FiUserCheck size={14} />
-                  Account
+            <FloatingActionMenu
+              className="relative bottom-auto right-auto"
+              direction="down"
+              isOpen={dropdownOpen}
+              onToggle={() => setDropdownOpen((prev) => !prev)}
+              trigger={
+                <button className="header-avatar" title="Profile">
+                  <FiUser />
                 </button>
-                <button className="header-dropdown-item" onClick={goToSettings}>
-                  <FiSettings size={14} />
-                  Settings
-                </button>
-                <div className="header-dropdown-divider" />
-                <button className="header-dropdown-item header-dropdown-logout" onClick={logout}>
-                  <FiLogOut size={14} />
-                  Logout
-                </button>
-              </div>
-            )}
+              }
+              options={[
+                {
+                  label: 'Account',
+                  Icon: <User className="w-4 h-4" />,
+                  onClick: goToAccount,
+                },
+                {
+                  label: 'Settings',
+                  Icon: <Settings className="w-4 h-4" />,
+                  onClick: goToSettings,
+                },
+                {
+                  label: 'Logout',
+                  Icon: <LogOut className="w-4 h-4" />,
+                  onClick: logout,
+                },
+              ]}
+            />
           </div>
         </div>
       </header>
@@ -244,13 +244,8 @@ function Header({ sidebarCollapsed }: HeaderProps) {
               <tbody>
                 {[
                   { label: 'Change Password', description: 'Update your account password', onClick: openChangePassword },
-                  { label: 'Two-Factor Authentication', description: 'Add an extra layer of security' },
                   { label: 'Email Notifications', description: 'Receive emails for task events and admin actions', toggle: true },
-                  { label: 'Privacy Settings', description: 'Control who can see your profile' },
-                  { label: 'Language', description: 'Choose your preferred language' },
                   { label: 'Theme', description: `Currently: ${theme === 'light' ? 'Light' : 'Dark'} mode`, onClick: toggleTheme },
-                  { label: 'Session Management', description: 'View and manage active sessions' },
-                  { label: 'Delete Account', description: 'Permanently delete your account and data' },
                 ].map((s) => (
                   <tr
                     key={s.label}

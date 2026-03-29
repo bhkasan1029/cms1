@@ -1,0 +1,976 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 6974
+>>
+stream
+0.5670000000000001 w
+0 G
+BT
+/F2 22 Tf
+25.2999999999999972 TL
+0 g
+42.5196850393700814 799.3703149606299121 Td
+(Role-Based Dashboard Architecture) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+42.5196850393700814 771.0238582677164914 Td
+(slateCMS — Multi-role dashboard routing system) Tj
+ET
+BT
+/F2 16 Tf
+18.3999999999999986 TL
+0 g
+42.5196850393700814 737.0081102362204319 Td
+(1. DashboardPage.tsx — Layout Shell) Tj
+ET
+0.39 G
+42.5196850393700814 714.3309448818897636 m
+552.7603149606298985 714.3309448818897636 l
+S
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 697.3230708661417339 Td
+(The outer layout wrapper. Renders the Sidebar, Header, and an <Outlet /> for nested route content. All authenticated) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 684.5671653543306547 Td
+(pages render inside this shell.) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 663.3073228346456744 Td
+(function DashboardPage\(\) {) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 652.5356692913385359 Td
+(  const [sidebarCollapsed, setSidebarCollapsed] = useState\(false\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 630.9923622047243725 Td
+(  return \() Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 620.2207086614173477 Td
+(    <div className="dashboard-layout">) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 609.4490551181102092 Td
+(      <Sidebar) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 598.6774015748031843 Td
+(        collapsed={sidebarCollapsed}) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 587.9057480314960458 Td
+(        onToggle={\(\) => setSidebarCollapsed\(\(prev\) => !prev\)}) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 577.1340944881890209 Td
+(      />) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 566.3624409448818824 Td
+(      <div className="dashboard-main">) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 555.5907874015748575 Td
+(        <Header sidebarCollapsed={sidebarCollapsed} />) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 544.8191338582678327 Td
+(        <main className="dashboard-content">) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 534.0474803149606942 Td
+(          <Outlet />) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 523.2758267716535556 Td
+(        </main>) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 512.5041732283465308 Td
+(      </div>) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 501.7325196850394491 Td
+(    </div>) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 490.9608661417323674 Td
+(  \);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 480.1892125984252857 Td
+(}) Tj
+ET
+BT
+/F2 16 Tf
+18.3999999999999986 TL
+0 g
+42.5196850393700814 460.9136220472441892 Td
+(2. DashboardHome.tsx — Role Router) Tj
+ET
+0.39 G
+42.5196850393700814 438.2364566929134639 m
+552.7603149606298985 438.2364566929134639 l
+S
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 421.2285826771654342 Td
+(The routing hub. Checks user.role from AuthContext and renders the appropriate dashboard component. This is the) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 408.472677165354412 Td
+(component rendered at /dashboard.) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 387.2128346456693748 Td
+(import { useAuth } from '../context/AuthContext';) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 376.4411811023622363 Td
+(import AdminDashboardHome from './AdminDashboardHome';) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 365.6695275590551546 Td
+(import ReviewerDashboardHome from './ReviewerDashboardHome';) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 354.8978740157480161 Td
+(import UserDashboardHome from './UserDashboardHome';) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 333.3545669291337958 Td
+(function DashboardHome\(\) {) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 322.5829133858266005 Td
+(  const { user } = useAuth\(\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 301.0396062992124371 Td
+(  if \(user?.role === 'admin'\) return <AdminDashboardHome />;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 290.2679527559052985 Td
+(  if \(user?.role === 'reviewer'\) return <ReviewerDashboardHome />;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 279.49629921259816 Td
+(  return <UserDashboardHome />;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 268.7246456692910215 Td
+(}) Tj
+ET
+BT
+/F2 16 Tf
+18.3999999999999986 TL
+0 g
+42.5196850393700814 249.4490551181098681 Td
+(3. AdminDashboardHome.tsx — Admin View) Tj
+ET
+0.39 G
+42.5196850393700814 226.7718897637791997 m
+552.7603149606298985 226.7718897637791997 l
+S
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 209.76401574803117 Td
+(Admin sees ALL tasks and ALL users. Fetches both getTasksApi\(\) and getUsersApi\(\). Shows 5-column hero metrics \(total) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 197.0081102362202046 Td
+(tasks, in progress, completed this week, overdue, total users\), a task overview with tabs, productivity chart \(Recharts) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 184.2522047244091254 Td
+(BarChart\), quick actions, deadlines, activity feed, user snapshot, and reports preview.) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 162.9923622047240315 Td
+(function AdminDashboardHome\(\) {) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 152.2207086614170066 Td
+(  const navigate = useNavigate\(\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 141.4490551181098681 Td
+(  const [tasks, setTasks] = useState<TaskRecord[]>\([]\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 130.6774015748027296 Td
+(  const [users, setUsers] = useState<UserRecord[]>\([]\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 109.1340944881885662 Td
+(  useEffect\(\(\) => {) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 98.3624409448814276 Td
+(    Promise.all\([getTasksApi\(\), getUsersApi\(\)]\)) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 87.5907874015742891 Td
+(      .then\(\([t, u]\) => { setTasks\(t\); setUsers\(u\); }\)) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 76.8191338582671506 Td
+(      .finally\(\(\) => setLoading\(false\)\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 66.0474803149601257 Td
+(  }, []\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 44.5041732283458487 Td
+(  // Metrics computed from ALL tasks) Tj
+ET
+endstream
+endobj
+5 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 6 0 R
+>>
+endobj
+6 0 obj
+<<
+/Length 7566
+>>
+stream
+0.5670000000000001 w
+0.39 G
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 799.3703149606299121 Td
+(  const totalTasks = tasks.length;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 788.5986614173227736 Td
+(  const inProgress = tasks.filter\(t => t.status === 'in_progress' && !t.finished\).length;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 777.8270078740157487 Td
+(  const completedThisWeek = tasks.filter\(t => t.finished && new Date\(t.updatedAt\) >= weekAgo\).length;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 767.0553543307086102 Td
+(  const overdue = tasks.filter\(t => !t.finished && new Date\(t.dueDate\) < now\).length;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 756.2837007874015853 Td
+(  const totalUsers = users.length;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 745.5120472440944468 Td
+(}) Tj
+ET
+BT
+/F2 16 Tf
+18.3999999999999986 TL
+0 g
+42.5196850393700814 726.2364566929134071 Td
+(4. ReviewerDashboardHome.tsx — Reviewer View) Tj
+ET
+0.39 G
+42.5196850393700814 703.559291338582625 m
+552.7603149606298985 703.559291338582625 l
+S
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 686.5514173228345953 Td
+(Reviewer sees only tasks where they are the reviewer \(t.reviewerId === user.userId\). Shows 4-column hero metrics) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 673.7955118110236299 Td
+(\(assigned to me, awaiting review, reviewed this week, overdue\), a review queue with tabs, quick actions, upcoming) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 661.0396062992125508 Td
+(deadlines, and activity feed.) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 639.7797637795275705 Td
+(function ReviewerDashboardHome\(\) {) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 629.0081102362204319 Td
+(  const { user } = useAuth\(\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 607.4648031496062686 Td
+(  useEffect\(\(\) => {) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 596.6931496062992437 Td
+(    getTasksApi\(\).then\(setTasks\).finally\(\(\) => setLoading\(false\)\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 585.9214960629921052 Td
+(  }, []\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 564.3781889763779418 Td
+(  // Filter: only tasks assigned to this reviewer) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 553.606535433070917 Td
+(  const myTasks = useMemo\() Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 542.8348818897638921 Td
+(    \(\) => tasks.filter\(\(t\) => t.reviewerId === user?.userId\),) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 532.0632283464567536 Td
+(    [tasks, user],) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 521.291574803149615 Td
+(  \);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 499.7482677165355085 Td
+(  const assignedToMe = myTasks.filter\(t => !t.finished\).length;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 488.9766141732284268 Td
+(  const awaitingReview = myTasks.filter\(t => t.status === 'in_progress' && !t.finished\).length;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 478.2049606299213451 Td
+(  const reviewedThisWeek = myTasks.filter\(t => t.finished && new Date\(t.updatedAt\) >= weekAgo\).length;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 467.4333070866142066 Td
+(}) Tj
+ET
+BT
+/F2 16 Tf
+18.3999999999999986 TL
+0 g
+42.5196850393700814 448.1577165354330532 Td
+(5. UserDashboardHome.tsx — User View) Tj
+ET
+0.39 G
+42.5196850393700814 425.4805511811023848 m
+552.7603149606298985 425.4805511811023848 l
+S
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 408.4726771653543551 Td
+(Regular user sees only tasks assigned to them \(t.assignedToId === user.userId\). Shows 4-column hero metrics \(my) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 395.7167716535433328 Td
+(tasks, in progress, completed this week, overdue\), a task list with tabs, upcoming deadlines, and activity feed.) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 374.4569291338582957 Td
+(function UserDashboardHome\(\) {) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 363.6852755905511572 Td
+(  const { user } = useAuth\(\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 342.1419685039369369 Td
+(  useEffect\(\(\) => {) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 331.3703149606297984 Td
+(    getTasksApi\(\).then\(setTasks\).finally\(\(\) => setLoading\(false\)\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 320.5986614173226599 Td
+(  }, []\);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 299.0553543307083828 Td
+(  // Filter: only tasks assigned to this user) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 288.283700787401358 Td
+(  const myTasks = useMemo\() Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 277.5120472440942194 Td
+(    \(\) => tasks.filter\(\(t\) => t.assignedToId === user?.userId\),) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 266.7403937007870809 Td
+(    [tasks, user],) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 255.9687401574799424 Td
+(  \);) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 234.4254330708656653 Td
+(  const totalMyTasks = myTasks.length;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 223.6537795275586404 Td
+(  const inProgress = myTasks.filter\(t => t.status === 'in_progress' && !t.finished\).length;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 212.8821259842515019 Td
+(  const completedThisWeek = myTasks.filter\(t => t.finished && new Date\(t.updatedAt\) >= weekAgo\).length;) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 202.1104724409443634 Td
+(}) Tj
+ET
+BT
+/F2 16 Tf
+18.3999999999999986 TL
+0 g
+42.5196850393700814 182.83488188976321 Td
+(6. Route Configuration \(App.tsx\)) Tj
+ET
+0.39 G
+42.5196850393700814 160.1577165354324848 m
+552.7603149606298985 160.1577165354324848 l
+S
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 143.1498425196845119 Td
+(The /dashboard route is nested inside ProtectedRoute and DashboardPage layout. DashboardHome is rendered at) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0 g
+42.5196850393700814 130.3939370078734328 Td
+(/dashboard, which then delegates to the role-specific component.) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 109.1340944881884525 Td
+(<Route element={<ProtectedRoute />}>) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 98.362440944881314 Td
+(  <Route element={<DashboardPage />}>) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 87.5907874015741754 Td
+(    <Route path="/dashboard" element={<DashboardHome />} />) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 76.8191338582670369 Td
+(    <Route path="/tasks" element={<TasksPage />} />) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 66.0474803149598984 Td
+(    ...) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 55.2758267716527598 Td
+(  </Route>) Tj
+ET
+BT
+/F5 8.5 Tf
+9.7749999999999986 TL
+0 g
+48.1889763779527627 44.504173228345735 Td
+(</Route>) Tj
+ET
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R 5 0 R ]
+/Count 2
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+19 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+20 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 7 0 R
+/F2 8 0 R
+/F3 9 0 R
+/F4 10 0 R
+/F5 11 0 R
+/F6 12 0 R
+/F7 13 0 R
+/F8 14 0 R
+/F9 15 0 R
+/F10 16 0 R
+/F11 17 0 R
+/F12 18 0 R
+/F13 19 0 R
+/F14 20 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+21 0 obj
+<<
+/Producer (jsPDF 4.2.1)
+/CreationDate (D:20260322210138+05'30')
+>>
+endobj
+22 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 23
+0000000000 65535 f 
+0000014933 00000 n 
+0000016758 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000007178 00000 n 
+0000007315 00000 n 
+0000014996 00000 n 
+0000015121 00000 n 
+0000015251 00000 n 
+0000015384 00000 n 
+0000015522 00000 n 
+0000015646 00000 n 
+0000015775 00000 n 
+0000015907 00000 n 
+0000016043 00000 n 
+0000016171 00000 n 
+0000016298 00000 n 
+0000016427 00000 n 
+0000016560 00000 n 
+0000016662 00000 n 
+0000017008 00000 n 
+0000017094 00000 n 
+trailer
+<<
+/Size 23
+/Root 22 0 R
+/Info 21 0 R
+/ID [ <33ABF200E300CD17F73862A82CE621F8> <33ABF200E300CD17F73862A82CE621F8> ]
+>>
+startxref
+17198
+%%EOF
