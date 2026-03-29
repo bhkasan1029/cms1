@@ -134,8 +134,6 @@ function AccountPage() {
           <div className="account-settings-menu">
             <button className="account-settings-item" onClick={() => setEditingName(true)}>Change Name</button>
             <button className="account-settings-item" onClick={openChangePassword}>Change Password</button>
-            <button className="account-settings-item">Privacy Settings</button>
-            <button className="account-settings-item">Notification Preferences</button>
           </div>
         </div>
 

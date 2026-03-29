@@ -29,7 +29,12 @@
       "Bash(npm --version:*)",
       "WebSearch",
       "Bash(node generate-summary-pdf.js:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(docker compose down:*)",
+      "Bash(pip3 install:*)",
+      "Bash(docker compose up:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(brew services:*)"
     ]
   }
 }

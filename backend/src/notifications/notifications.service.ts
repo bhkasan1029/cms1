@@ -6,7 +6,6 @@ import {
   NotificationType,
   NotificationCategory,
 } from './notification.entity';
-import { NotificationsGateway } from './notifications.gateway';
 
 export interface CreateNotificationDto {
   type: NotificationType;
@@ -30,7 +29,6 @@ export class NotificationsService {
   constructor(
     @InjectRepository(Notification)
     private readonly repo: Repository<Notification>,
-    private readonly gateway: NotificationsGateway,
   ) {}
 
   async createAndSend(dto: CreateNotificationDto): Promise<Notification> {
@@ -39,11 +37,7 @@ export class NotificationsService {
       : NotificationCategory.SYSTEM;
 
     const notification = this.repo.create({ ...dto, category });
-    const saved = await this.repo.save(notification);
-
-    this.gateway.sendToUser(dto.userId, saved);
-
-    return saved;
+    return this.repo.save(notification);
   }
 
   async findByUser(

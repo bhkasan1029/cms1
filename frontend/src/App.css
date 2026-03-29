@@ -2516,3 +2516,77 @@
 .task-btn-delete:hover:not(:disabled) {
   background: rgba(239, 68, 68, 0.2);
 }
+
+/* ── Notification Toasts ── */
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 340px;
+}
+
+.toast-item {
+  position: relative;
+  background: var(--n1);
+  border: 1px solid var(--n3);
+  border-radius: 12px;
+  padding: 0.85rem 1rem 0.85rem 2.2rem;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  animation: toast-slide-in 0.3s ease forwards;
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.toast-close {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: none;
+  background: var(--n3);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toast-close:hover {
+  background: var(--n5);
+}
+
+.toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.toast-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.toast-message {
+  font-size: 0.78rem;
+  color: var(--text-2);
+  line-height: 1.35;
+}

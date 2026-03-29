@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { signupApi, forgotPasswordApi } from '../api/auth';
 import axios from 'axios';
@@ -30,9 +30,15 @@ function LoginPage() {
   const [success, setSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Redirect: If the user is already authenticated (e.g. navigated here from the landing page
+  // via "Get Started"), skip the login form and send them straight to the dashboard.
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   // Pick up success message from ResetPasswordPage redirect
   const locationState = location.state as { success?: string } | null;

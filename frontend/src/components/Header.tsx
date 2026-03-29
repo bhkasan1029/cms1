@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { FiSearch, FiBell, FiUser, FiSettings, FiLogOut, FiUserCheck, FiX, FiSun, FiMoon } from 'react-icons/fi';
 import { Settings, User, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -106,7 +106,7 @@ function Header({ sidebarCollapsed }: HeaderProps) {
   return (
     <>
       <header className="app-header">
-        {sidebarCollapsed && <div className="header-brand">slateCMS</div>}
+        {sidebarCollapsed && <Link to="/" className="header-brand" style={{ textDecoration: 'none', color: 'inherit' }}>slateCMS</Link>}
         <div className="header-search">
           <FiSearch className="header-search-icon" />
           <input type="text" placeholder="Search..." readOnly />

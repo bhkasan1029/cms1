@@ -4,11 +4,10 @@ import {
   useState,
   useEffect,
   useCallback,
+  useRef,
 } from 'react';
 import type { ReactNode } from 'react';
-import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
-import { API_BASE_URL } from '../api/client';
 import {
   getNotificationsApi,
   getUnreadCountApi,
@@ -16,6 +15,8 @@ import {
   markAllAsReadApi,
 } from '../api/notifications';
 import type { NotificationRecord } from '../api/notifications';
+import NotificationToast from '../components/NotificationToast';
+import type { Toast } from '../components/NotificationToast';
 
 interface NotificationContextType {
   notifications: NotificationRecord[];
@@ -33,13 +34,39 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<NotificationRecord[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const knownIdsRef = useRef<Set<string>>(new Set());
+  const isFirstFetchRef = useRef(true);
+
+  const dismissToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
   const fetchNotifications = useCallback(async (category?: string) => {
     setIsLoading(true);
     try {
       const data = await getNotificationsApi(category);
-      setNotifications(data.notifications);
+      const incoming = data.notifications;
+
+      // On first fetch, just record known IDs without showing toasts
+      if (isFirstFetchRef.current) {
+        isFirstFetchRef.current = false;
+        knownIdsRef.current = new Set(incoming.map((n) => n.id));
+      } else {
+        // On subsequent polls, detect new notifications and show as toasts
+        const newOnes = incoming.filter((n) => !knownIdsRef.current.has(n.id));
+        if (newOnes.length > 0) {
+          const newToasts: Toast[] = newOnes.map((n) => ({
+            id: n.id,
+            title: n.title,
+            message: n.message,
+          }));
+          setToasts((prev) => [...newToasts, ...prev]);
+          newOnes.forEach((n) => knownIdsRef.current.add(n.id));
+        }
+      }
+
+      setNotifications(incoming);
     } catch {
       // ignore
     } finally {
@@ -56,32 +83,25 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Connect socket + fetch initial data when authenticated
+  // Fetch initial data + poll every 30 seconds
   useEffect(() => {
     if (!isAuthenticated || !token) {
       setNotifications([]);
       setUnreadCount(0);
+      isFirstFetchRef.current = true;
+      knownIdsRef.current.clear();
       return;
     }
 
     fetchNotifications();
     fetchUnreadCount();
 
-    const s = io(API_BASE_URL, {
-      auth: { token },
-    });
+    const interval = setInterval(() => {
+      fetchNotifications();
+      fetchUnreadCount();
+    }, 30000);
 
-    s.on('notification', (notification: NotificationRecord) => {
-      setNotifications((prev) => [notification, ...prev]);
-      setUnreadCount((prev) => prev + 1);
-    });
-
-    setSocket(s);
-
-    return () => {
-      s.disconnect();
-      setSocket(null);
-    };
+    return () => clearInterval(interval);
   }, [isAuthenticated, token, fetchNotifications, fetchUnreadCount]);
 
   const markAsRead = useCallback(async (id: string) => {
@@ -118,6 +138,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
+      <NotificationToast toasts={toasts} onDismiss={dismissToast} />
     </NotificationContext.Provider>
   );
 }

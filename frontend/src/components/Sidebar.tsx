@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import {
   FiGrid,
   FiCheckSquare,
@@ -48,10 +48,10 @@ function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </button>
         ) : (
           <>
-            <div className="sidebar-brand">
+            <Link to="/" className="sidebar-brand" style={{ textDecoration: 'none', color: 'inherit' }}>
               <FiHexagon className="sidebar-logo-icon" />
               <span className="sidebar-logo-text">slateCMS</span>
-            </div>
+            </Link>
             <button className="sidebar-toggle" onClick={onToggle} title="Collapse sidebar">
               <FiMenu />
             </button>

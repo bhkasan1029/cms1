@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { NotificationProvider } from './context/NotificationContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import RoleGuardedRoute from './components/RoleGuardedRoute';
 import LoginPage from './pages/LoginPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
@@ -33,8 +34,10 @@ function App() {
               <Route path="/tasks" element={<TasksPage />} />
               <Route path="/tasks/:id" element={<TaskDetailPage />} />
               <Route path="/report" element={<ReportPage />} />
-              <Route path="/create-task" element={<CreateTaskPage />} />
-              <Route path="/user-management" element={<UserManagementPage />} />
+              <Route element={<RoleGuardedRoute allowedRoles={['admin', 'reviewer']} />}>
+                <Route path="/create-task" element={<CreateTaskPage />} />
+                <Route path="/user-management" element={<UserManagementPage />} />
+              </Route>
               <Route path="/account" element={<AccountPage />} />
               <Route path="/profile/:userId" element={<ProfilePage />} />
             </Route>
